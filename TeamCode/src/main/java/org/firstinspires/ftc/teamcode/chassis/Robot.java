@@ -69,6 +69,8 @@ public class Robot {
         BL.setDirection(DcMotorSimple.Direction.FORWARD);
         FR.setDirection(DcMotorSimple.Direction.REVERSE);
         BR.setDirection(DcMotorSimple.Direction.REVERSE);
+        
+        nomServo.scaleRange(0.0, 0.01);
 
        // sensor1 = (Rev2mDistanceSensor) hwMap.get(DistanceSensor.class, "sensor1");
         resetTicks();
