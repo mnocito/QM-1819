@@ -2,20 +2,19 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.chassis.Robot;
+import org.firstinspires.ftc.teamcode.misc.IMU;
 import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
-@TeleOp(name = "Gyro test")
-public class GyroTest extends LinearOpMode {
-    private Robot robot = new Robot();
+@TeleOp(name = "Gyro Single Test")
+public class GyroSingleTest extends LinearOpMode {
+    private IMU imu = new IMU();
     private double rightx = 0;
     private double leftx = 0;
     private double lefty = 0;
     public void runOpMode() throws InterruptedException {
-        robot.init(hardwareMap, this, true);
+        imu.init(hardwareMap, "imu");
         telemetry.addData("Status", "Initialization bas been completed");
         telemetry.update();
         waitForStart();
@@ -23,23 +22,13 @@ public class GyroTest extends LinearOpMode {
             lefty = FtcUtils.motorScale(gamepad1.left_stick_y) * RobotConstants.sensitivity;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
             leftx = FtcUtils.motorScale(gamepad1.left_stick_x) * RobotConstants.sensitivity;
-            telemetry.addData("gyro", robot.imu.getAngle());
-            robot.imu.updateAngle();
-            if (FtcUtils.abs(lefty) > RobotConstants.threshold) {
-                robot.drive(-lefty, -lefty, -lefty, -lefty);
-            } else if (FtcUtils.abs(leftx) > RobotConstants.threshold) {
-                robot.drive(leftx, -leftx, leftx, -leftx);
-            }  else if (FtcUtils.abs(rightx) > RobotConstants.threshold) {
-                robot.drive(-rightx, -rightx, rightx, rightx);
-            } else {
-                robot.stop();
-            }
+            telemetry.addData("gyro", imu.getAngle());
+            imu.updateAngle();
             if (gamepad1.x) {
-                robot.imu.resetAngle();
+                imu.resetAngle();
             }
             telemetry.update();
             idle();
         }
-        robot.stop();
     }
 }

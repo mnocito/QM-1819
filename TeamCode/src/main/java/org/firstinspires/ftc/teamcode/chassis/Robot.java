@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode.chassis;
+
+import org.firstinspires.ftc.teamcode.misc.IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -32,12 +34,8 @@ import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 public class Robot {
     HardwareMap hwMap;
     ElapsedTime clock = new ElapsedTime();
-    public BNO055IMU imu;
+    public IMU imu;
     private Rev2mDistanceSensor sensor1;
-    BNO055IMU.Parameters parameters;
-    private Orientation lastAngles;
-    private Orientation currentAngles;
-    private double globalAngle = 0;
     private int encoderPos = 0;
     private DcMotor FR = null;
     private DcMotor FL = null;
@@ -79,12 +77,8 @@ public class Robot {
         BR.setDirection(DcMotorSimple.Direction.REVERSE);
         resetTicks();
         if (initSensors) {
-            imu = hwMap.get(BNO055IMU.class, "imu 1");
-            parameters = new BNO055IMU.Parameters();
-            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-            imu.initialize(parameters);
-            resetAngle();
+            imu.init(hwMap, "imu");
+            imu.resetAngle();
         }
     }
     public void init(HardwareMap ahwMap, LinearOpMode context) {
@@ -95,13 +89,16 @@ public class Robot {
         resetTicks();
         long startTime = System.currentTimeMillis();
         long currentTime = startTime;
+        double newPow = FtcUtils.map(FtcUtils.abs(ticks) - FtcUtils.abs(getTicks()), 0, FtcUtils.abs(ticks), RobotConstants.LOWEST_MOTOR_POWER, pow);
         // While we still have ticks to drive AND we haven't exceeded the time limit, move in the specified direction.
-        while (Math.abs(getTicks()) < Math.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
-            drive(-FtcUtils.sign(ticks) * FtcUtils.abs(pow), -FtcUtils.sign(ticks) * FtcUtils.abs(pow), -FtcUtils.sign(ticks) * FtcUtils.abs(pow), -FtcUtils.sign(ticks) * FtcUtils.abs(pow));
+        while (FtcUtils.abs(getTicks()) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
+            drive(-FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow));
             currentTime = System.currentTimeMillis();
             context.telemetry.addData("Target", ticks);
             context.telemetry.addData("Current", getTicks());
+            context.telemetry.addData("newPow", newPow);
             context.telemetry.update();
+            newPow = FtcUtils.map(FtcUtils.abs(ticks) - FtcUtils.abs(getTicks()), 0, FtcUtils.abs(ticks), RobotConstants.LOWEST_MOTOR_POWER, pow);
         }
         stop();
         context.telemetry.addData("status", "done");
@@ -124,35 +121,26 @@ public class Robot {
         stop();
     }
 
-    public void resetAngle() {
-        lastAngles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        globalAngle = 0;
-    }
-    public double updateAngle() {
-        currentAngles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        globalAngle += FtcUtils.normalizeDegrees(currentAngles.firstAngle - lastAngles.firstAngle);
-        lastAngles = currentAngles;
-        return globalAngle;
-    }
     public void rotate(double degs, double pow, int timeout) {
-        resetAngle();
+        imu.resetAngle();
         long startTime = System.currentTimeMillis();
         long currentTime = startTime;
-        double newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(globalAngle), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_MOTOR_POWER, pow);
+        double newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_MOTOR_POWER, pow);
         context.telemetry.addData("status", "waiting for start");
         context.telemetry.addData("newPow", newPow);
-        context.telemetry.addData("globalAngle", globalAngle);
-        context.telemetry.addData("global less than degs", FtcUtils.abs(globalAngle) < FtcUtils.abs(degs));
+        context.telemetry.addData("globalAngle", imu.getAngle());
+        context.telemetry.addData("global less than degs", FtcUtils.abs(imu.getAngle()) < FtcUtils.abs(degs));
         context.telemetry.update();
-        while (FtcUtils.abs(globalAngle) < FtcUtils.abs(degs) && currentTime - startTime < timeout && context.opModeIsActive()); {
+        degs = -degs;
+        while (FtcUtils.abs(imu.getAngle()) < FtcUtils.abs(degs) && currentTime - startTime < timeout && context.opModeIsActive()) {
             drive(-FtcUtils.sign(degs) * newPow, -FtcUtils.sign(degs) * newPow, FtcUtils.sign(degs) * newPow, FtcUtils.sign(degs) * newPow);
-            newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(globalAngle), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_MOTOR_POWER, pow);
+            newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_MOTOR_POWER, pow);
             context.telemetry.addData("cur pow", newPow);
-            context.telemetry.addData("cur angle", globalAngle);
-            context.telemetry.addData("angle diff", FtcUtils.abs(degs) - FtcUtils.abs(globalAngle));
+            context.telemetry.addData("cur angle", imu.getAngle());
+            context.telemetry.addData("angle diff", FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()));
             context.telemetry.update();
             currentTime = System.currentTimeMillis();
-            updateAngle();
+            imu.updateAngle();
         }
         stop();
         context.telemetry.addData("status", "done");
@@ -179,9 +167,6 @@ public class Robot {
     public void nomServo(double pos) {
         nomServo1.setPosition(pos);
    //     nomServo2.setPosition(pos);
-    }
-    public double getAngle() {
-        return globalAngle;
     }
     public double nomServoPos() {
         return /*FtcUtils.roundTwoDecimalPlaces(*/nomServo1.getPosition();
