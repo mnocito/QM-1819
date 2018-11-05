@@ -29,28 +29,24 @@
 
 package org.firstinspires.ftc.teamcode.autonomous;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.chassis.Robot;
+import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
-@Autonomous(name="Gyro Auto Test", group = "Autonomous")
-public class GyroAutoTest extends LinearOpMode {
+@Autonomous(name="Team Marker Servo Test", group = "Autonomous")
+public class TeamMarkerServoTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
-        robot.init(hardwareMap, this, true);
-        while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
-            telemetry.addData("Status", "waiting for calibration");
-            telemetry.update();
-            idle();
-        }
+        robot.init(hardwareMap, this, false);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.rotate(40, .3, 2500);
+        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
+        sleep(3000);
+        robot.markerServo(RobotConstants.MARKERSERVO_DROP);
     }
 }

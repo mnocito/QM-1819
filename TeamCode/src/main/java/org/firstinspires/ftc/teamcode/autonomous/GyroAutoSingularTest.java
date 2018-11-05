@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.misc.FtcUtils;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.teamcode.misc.IMU;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
@@ -45,7 +46,7 @@ public class GyroAutoSingularTest extends LinearOpMode {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
         imu.init(hardwareMap, "imu");
-        while (imu.isGyroCalibrated()) {
+        while (!imu.isGyroCalibrated() && opModeIsActive()) {
             idle();
         }
         imu.resetAngle();

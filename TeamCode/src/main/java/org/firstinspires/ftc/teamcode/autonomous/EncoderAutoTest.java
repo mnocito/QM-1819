@@ -61,13 +61,15 @@ public class EncoderAutoTest extends LinearOpMode {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
         robot.init(hardwareMap, this, true);
-        while (!robot.imu.isGyroCalibrated()) {
+        while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
+            telemetry.addData("Status", "waiting for calibration");
+            telemetry.update();
             idle();
         }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
         robot.moveTicks(500, .3, 5000);
-        robot.rotate(40, .5, 2500);
+        robot.rotate(40, .3, 2500);
     }
 }

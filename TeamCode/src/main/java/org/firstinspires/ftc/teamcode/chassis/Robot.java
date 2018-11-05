@@ -45,6 +45,7 @@ public class Robot {
     private DcMotor extend = null;
     private DcMotor BL = null;
     private Servo nomServo1 = null;
+    private Servo markerServo = null;
     private LinearOpMode context;
     private Servo nomServo2 = null;
     private DcMotor catapult = null;
@@ -52,6 +53,7 @@ public class Robot {
         this.context = context;
         hwMap = ahwMap;
         FR = hwMap.get(DcMotor.class, "FR");
+        imu = new IMU();
         FL = hwMap.get(DcMotor.class, "FL");
         nom = hwMap.get(DcMotor.class, "nom");
         extend = hwMap.get(DcMotor.class, "extend");
@@ -59,6 +61,7 @@ public class Robot {
         BR = hwMap.get(DcMotor.class, "BR");
         BL = hwMap.get(DcMotor.class, "BL");
         nomServo1 = hwMap.get(Servo.class, "nomServo1");
+        markerServo = hwMap.get(Servo.class, "markerServo");
     //    nomServo2 = hwMap.get(Servo.class, "nomServo2");
         catapult = hwMap.get(DcMotor.class, "catapult");
         catapult.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -161,12 +164,17 @@ public class Robot {
     public void hang(double power) {
         hang.setPower(power);
     }
+    public void hangTicks(double power, int ticks) {
+        hang.setPower(power);
+    }
     public void extend(double power) {
         extend.setPower(power);
     }
     public void nomServo(double pos) {
         nomServo1.setPosition(pos);
-   //     nomServo2.setPosition(pos);
+    }
+    public void markerServo(double pos) {
+        markerServo.setPosition(pos);
     }
     public double nomServoPos() {
         return /*FtcUtils.roundTwoDecimalPlaces(*/nomServo1.getPosition();

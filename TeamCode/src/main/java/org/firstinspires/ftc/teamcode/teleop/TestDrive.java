@@ -27,6 +27,7 @@ public class TestDrive extends LinearOpMode {
         telemetry.update();
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
+            robot.markerServo(RobotConstants.MARKERSERVO_DROP);
             telemetry.addData("nom servo pos", robot.nomServoPos());
             lefty = FtcUtils.motorScale(gamepad1.left_stick_y) * RobotConstants.sensitivity;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
