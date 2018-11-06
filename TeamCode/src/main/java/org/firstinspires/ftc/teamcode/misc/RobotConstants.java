@@ -13,6 +13,6 @@ public class RobotConstants {
     public static double threshold = .5;
     public static double sensitivity = .9;
     public enum Position {
-        LEFT, RIGHT, CENTER;
+        LEFT, RIGHT, CENTER
     }
 }

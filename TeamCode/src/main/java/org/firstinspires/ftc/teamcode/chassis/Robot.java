@@ -75,6 +75,9 @@ public class Robot {
     public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors) {
         init(ahwMap, context, initSensors, false);
     }
+    public void init(HardwareMap ahwMap, LinearOpMode context) {
+        init(ahwMap, context, false, false);
+    }
     public void moveTicks(int ticks, double pow, int timeout) {
         resetTicks();
         long startTime = System.currentTimeMillis();
