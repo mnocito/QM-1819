@@ -88,7 +88,6 @@ public class Robot {
     public void init(HardwareMap ahwMap, LinearOpMode context) {
         init(ahwMap, context, true);
     }
-
     public void moveTicks(int ticks, double pow, int timeout) {
         resetTicks();
         long startTime = System.currentTimeMillis();
@@ -148,7 +147,7 @@ public class Robot {
         imu.resetAngle();
         long startTime = System.currentTimeMillis();
         long currentTime = startTime;
-        double newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_MOTOR_POWER, pow);
+        double newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_TURN_POWER, pow);
         context.telemetry.addData("status", "waiting for start");
         context.telemetry.addData("newPow", newPow);
         context.telemetry.addData("globalAngle", imu.getAngle());
@@ -157,7 +156,7 @@ public class Robot {
         degs = degs;
         while (FtcUtils.abs(imu.getAngle()) < FtcUtils.abs(degs) && currentTime - startTime < timeout && context.opModeIsActive()) {
             drive(-FtcUtils.sign(degs) * newPow, -FtcUtils.sign(degs) * newPow, FtcUtils.sign(degs) * newPow, FtcUtils.sign(degs) * newPow);
-            newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_MOTOR_POWER, pow);
+            newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_TURN_POWER, pow);
             context.telemetry.addData("cur pow", newPow);
             context.telemetry.addData("cur angle", imu.getAngle());
             context.telemetry.addData("angle diff", FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()));

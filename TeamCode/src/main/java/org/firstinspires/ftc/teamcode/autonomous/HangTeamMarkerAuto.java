@@ -54,11 +54,11 @@ public class HangTeamMarkerAuto extends LinearOpMode {
         waitForStart();
         robot.hangTicks(15000, 1, 10000);
         sleep(1500);
-        robot.moveTicks(250, .25, 4000);
+        robot.moveTicks(200, .25, 4000);
         sleep(500);
         robot.strafeTicks(250, .35, 4000);
         sleep(500);
-        robot.moveTicks(-250, .25, 4000);
+        robot.moveTicks(-200, .25, 4000);
 
     }
 }
