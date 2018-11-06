@@ -34,8 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import org.firstinspires.ftc.teamcode.misc.IMU;
-import org.firstinspires.ftc.teamcode.misc.RobotConstants;
+import org.firstinspires.ftc.teamcode.chassis.IMU;
 
 
 @Autonomous(name="Gyro Auto Singular Test", group = "Autonomous")

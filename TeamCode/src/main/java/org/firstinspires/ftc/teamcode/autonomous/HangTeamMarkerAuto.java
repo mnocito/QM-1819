@@ -42,7 +42,7 @@ public class HangTeamMarkerAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
-        robot.init(hardwareMap, this, true);
+        robot.init(hardwareMap, this, true, true);
         while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
             telemetry.addData("Status", "waiting for calibration");
             telemetry.update();

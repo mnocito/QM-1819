@@ -1,30 +1,14 @@
 package org.firstinspires.ftc.teamcode.chassis;
 
-import org.firstinspires.ftc.teamcode.misc.IMU;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DigitalChannelController;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
@@ -35,6 +19,7 @@ public class Robot {
     HardwareMap hwMap;
     ElapsedTime clock = new ElapsedTime();
     public IMU imu;
+    public Sampler sampler;
     private Rev2mDistanceSensor sensor1;
     private int encoderPos = 0;
     private int hangEncoderPos = 0;
@@ -50,7 +35,7 @@ public class Robot {
     private LinearOpMode context;
     private Servo nomServo2 = null;
     private DcMotor catapult = null;
-    public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors) {
+    public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors, boolean initVision) {
         this.context = context;
         hwMap = ahwMap;
         FR = hwMap.get(DcMotor.class, "FR");
@@ -63,7 +48,6 @@ public class Robot {
         BL = hwMap.get(DcMotor.class, "BL");
         nomServo1 = hwMap.get(Servo.class, "nomServo1");
         markerServo = hwMap.get(Servo.class, "markerServo");
-    //    nomServo2 = hwMap.get(Servo.class, "nomServo2");
         catapult = hwMap.get(DcMotor.class, "catapult");
         catapult.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -84,9 +68,12 @@ public class Robot {
             imu.init(hwMap, "imu");
             imu.resetAngle();
         }
+        if (initVision) {
+            sampler.init(hwMap, this.context);
+        }
     }
-    public void init(HardwareMap ahwMap, LinearOpMode context) {
-        init(ahwMap, context, true);
+    public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors) {
+        init(ahwMap, context, initSensors, false);
     }
     public void moveTicks(int ticks, double pow, int timeout) {
         resetTicks();
@@ -126,14 +113,12 @@ public class Robot {
         context.telemetry.addData("status", "done");
         context.telemetry.update();
     }
-
     public void drive(double fl, double bl, double fr, double br) {
         FL.setPower(fl);
         BL.setPower(bl);
         FR.setPower(fr);
         BR.setPower(br);
     }
-
     public void drive(double fl, double bl, double fr, double br, int time) {
         FL.setPower(fl);
         BL.setPower(bl);
@@ -142,7 +127,6 @@ public class Robot {
         context.sleep(time);
         stop();
     }
-
     public void rotate(double degs, double pow, int timeout) {
         imu.resetAngle();
         long startTime = System.currentTimeMillis();
@@ -214,9 +198,7 @@ public class Robot {
     public void markerServo(double pos) {
         markerServo.setPosition(pos);
     }
-    public double nomServoPos() {
-        return /*FtcUtils.roundTwoDecimalPlaces(*/nomServo1.getPosition();
-    }
+    public double nomServoPos() { return nomServo1.getPosition(); }
     public double sensorOneDist() {
         return sensor1.getDistance(DistanceUnit.INCH);
     }
