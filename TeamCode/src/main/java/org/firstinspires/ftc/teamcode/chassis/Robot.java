@@ -37,6 +37,7 @@ public class Robot {
     public IMU imu;
     private Rev2mDistanceSensor sensor1;
     private int encoderPos = 0;
+    private int hangEncoderPos = 0;
     private DcMotor FR = null;
     private DcMotor FL = null;
     private DcMotor BR = null;
@@ -95,13 +96,32 @@ public class Robot {
         double newPow = FtcUtils.map(FtcUtils.abs(ticks) - FtcUtils.abs(getTicks()), 0, FtcUtils.abs(ticks), RobotConstants.LOWEST_MOTOR_POWER, pow);
         // While we still have ticks to drive AND we haven't exceeded the time limit, move in the specified direction.
         while (FtcUtils.abs(getTicks()) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
-            drive(-FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow));
+            drive(FtcUtils.sign(ticks) * FtcUtils.abs(newPow), FtcUtils.sign(ticks) * FtcUtils.abs(newPow), FtcUtils.sign(ticks) * FtcUtils.abs(newPow), FtcUtils.sign(ticks) * FtcUtils.abs(newPow));
             currentTime = System.currentTimeMillis();
             context.telemetry.addData("Target", ticks);
             context.telemetry.addData("Current", getTicks());
             context.telemetry.addData("newPow", newPow);
             context.telemetry.update();
             newPow = FtcUtils.map(FtcUtils.abs(ticks) - FtcUtils.abs(getTicks()), 0, FtcUtils.abs(ticks), RobotConstants.LOWEST_MOTOR_POWER, pow);
+        }
+        stop();
+        context.telemetry.addData("status", "done");
+        context.telemetry.update();
+    }
+    public void strafeTicks(int ticks, double pow, int timeout) {
+        resetTicks();
+        long startTime = System.currentTimeMillis();
+        long currentTime = startTime;
+        double newPow = FtcUtils.map(FtcUtils.abs(ticks) - FtcUtils.abs(getTicks()), 0, FtcUtils.abs(ticks), RobotConstants.LOWEST_STRAFE_POWER, pow);
+        // While we still have ticks to drive AND we haven't exceeded the time limit, move in the specified direction.
+        while (FtcUtils.abs(getTicks()) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
+            drive(FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow), FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow));
+            currentTime = System.currentTimeMillis();
+            context.telemetry.addData("Target", ticks);
+            context.telemetry.addData("Current", getTicks());
+            context.telemetry.addData("newPow", newPow);
+            context.telemetry.update();
+            newPow = FtcUtils.map(FtcUtils.abs(ticks) - FtcUtils.abs(getTicks()), 0, FtcUtils.abs(ticks), RobotConstants.LOWEST_STRAFE_POWER, pow);
         }
         stop();
         context.telemetry.addData("status", "done");
@@ -134,7 +154,7 @@ public class Robot {
         context.telemetry.addData("globalAngle", imu.getAngle());
         context.telemetry.addData("global less than degs", FtcUtils.abs(imu.getAngle()) < FtcUtils.abs(degs));
         context.telemetry.update();
-        degs = -degs;
+        degs = degs;
         while (FtcUtils.abs(imu.getAngle()) < FtcUtils.abs(degs) && currentTime - startTime < timeout && context.opModeIsActive()) {
             drive(-FtcUtils.sign(degs) * newPow, -FtcUtils.sign(degs) * newPow, FtcUtils.sign(degs) * newPow, FtcUtils.sign(degs) * newPow);
             newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_MOTOR_POWER, pow);
@@ -149,11 +169,33 @@ public class Robot {
         context.telemetry.addData("status", "done");
         context.telemetry.update();
     }
+    public void hangTicks(int ticks, double pow, int timeout) {
+        resetHangTicks();
+        long startTime = System.currentTimeMillis();
+        long currentTime = startTime;
+        // While we still have ticks to drive AND we haven't exceeded the time limit, move in the specified direction.
+        while (FtcUtils.abs(getHangTicks()) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
+            hang(pow);
+            currentTime = System.currentTimeMillis();
+            context.telemetry.addData("Target", ticks);
+            context.telemetry.addData("Current", getHangTicks());
+            context.telemetry.update();
+        }
+        hang(0);
+        context.telemetry.addData("status", "done");
+        context.telemetry.update();
+    }
     public void resetTicks() {
         encoderPos = BL.getCurrentPosition();
     }
+    public void resetHangTicks() {
+        hangEncoderPos = hang.getCurrentPosition();
+    }
     public int getTicks() {
         return BL.getCurrentPosition() - encoderPos;
+    }
+    public int getHangTicks() {
+        return hang.getCurrentPosition() - hangEncoderPos;
     }
     public void nom(double power) {
         nom.setPower(power);
@@ -162,9 +204,6 @@ public class Robot {
         catapult.setPower(power);
     }
     public void hang(double power) {
-        hang.setPower(power);
-    }
-    public void hangTicks(double power, int ticks) {
         hang.setPower(power);
     }
     public void extend(double power) {

@@ -39,6 +39,7 @@ import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
 @Autonomous(name="Gyro Auto Singular Test", group = "Autonomous")
+@Disabled
 public class GyroAutoSingularTest extends LinearOpMode {
     private IMU imu = new IMU();
     double degs = 50; // degrees to turn

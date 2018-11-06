@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 @TeleOp(name = "Gyro Single Test")
-//@Disabled
+@Disabled
 public class GyroSingleTest extends LinearOpMode {
     private IMU imu = new IMU();
     private double rightx = 0;

@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 @TeleOp(name = "Gyro test")
-//@Disabled
+@Disabled
 public class GyroTest extends LinearOpMode {
     private Robot robot = new Robot();
     private double rightx = 0;

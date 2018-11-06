@@ -23,11 +23,12 @@ public class TestDrive extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap, this, false);
         robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
+        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
         telemetry.addData("Status", "Initialization bas been completed");
         telemetry.update();
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
-            robot.markerServo(RobotConstants.MARKERSERVO_DROP);
+            robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
             telemetry.addData("nom servo pos", robot.nomServoPos());
             lefty = FtcUtils.motorScale(gamepad1.left_stick_y) * RobotConstants.sensitivity;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
