@@ -83,10 +83,12 @@ public class Sampler {
                                 if (tfod != null) tfod.shutdown();
                                 context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
                                 context.telemetry.update();
+                                return RobotConstants.Position.LEFT;
                             } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
                                 if (tfod != null) tfod.shutdown();
                                 context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.RIGHT);
                                 context.telemetry.update();
+                                return RobotConstants.Position.RIGHT;
                             } else {
                                 if (tfod != null) tfod.shutdown();
                                 context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);

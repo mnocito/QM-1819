@@ -157,18 +157,26 @@ public class Robot {
         context.telemetry.update();
     }
     public void hangTicks(int ticks, double pow, int timeout) {
-        resetHangTicks();
+        runEncoderMotor(hang, ticks, pow, timeout);
+    }
+    public void extendTicks(int ticks, double pow, int timeout) {
+        runEncoderMotor(extend, ticks, pow, timeout);
+    }
+    private void runEncoderMotor(DcMotor motor, int ticks, double pow, int timeout) {
+        int encoderPos = motor.getCurrentPosition();
+        int currentPos = motor.getCurrentPosition() - encoderPos;
         long startTime = System.currentTimeMillis();
         long currentTime = startTime;
         // While we still have ticks to drive AND we haven't exceeded the time limit, move in the specified direction.
-        while (FtcUtils.abs(getHangTicks()) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
-            hang(pow);
+        while (FtcUtils.abs(currentPos) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
+            motor.setPower(pow);
             currentTime = System.currentTimeMillis();
             context.telemetry.addData("Target", ticks);
-            context.telemetry.addData("Current", getHangTicks());
+            context.telemetry.addData("Current", currentPos);
             context.telemetry.update();
+            currentPos = motor.getCurrentPosition() - encoderPos;
         }
-        hang(0);
+        motor.setPower(0);
         context.telemetry.addData("status", "done");
         context.telemetry.update();
     }
@@ -187,14 +195,8 @@ public class Robot {
     public void resetTicks() {
         encoderPos = BL.getCurrentPosition();
     }
-    public void resetHangTicks() {
-        hangEncoderPos = hang.getCurrentPosition();
-    }
     public int getTicks() {
         return BL.getCurrentPosition() - encoderPos;
-    }
-    public int getHangTicks() {
-        return hang.getCurrentPosition() - hangEncoderPos;
     }
     public void nom(double power) {
         nom.setPower(power);

@@ -23,18 +23,15 @@ public class FtcUtils {
     public static double threshold(double d) {
         return threshold(d, d);
     }
-
     public static double threshold(double d, double o) {
         if (Math.abs(d) > RobotConstants.threshold)
             return o;
         else
             return 0.0;
     }
-
     public static double roundTwoDecimalPlaces(double val) {
         return Math.round(val * 100.0) / 100.0;
     }
-
     public static double map(double x, double in_min, double in_max, double out_min, double out_max) {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
