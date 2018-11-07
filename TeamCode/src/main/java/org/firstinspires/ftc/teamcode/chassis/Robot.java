@@ -172,6 +172,18 @@ public class Robot {
         context.telemetry.addData("status", "done");
         context.telemetry.update();
     }
+    public double getSamplerTurnDegrees() {
+        switch (sampler.getPosition(10000)) {
+            case LEFT:
+                return -30.0;
+            case RIGHT:
+                return 30.0;
+            case CENTER:
+                return 0.0;
+            default:
+                return 0.0;
+        }
+    }
     public void resetTicks() {
         encoderPos = BL.getCurrentPosition();
     }

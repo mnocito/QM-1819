@@ -39,6 +39,7 @@ import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 @Autonomous(name="Hang Team Marker Auto", group = "Autonomous")
 public class HangTeamMarkerAuto extends LinearOpMode {
     private Robot robot = new Robot();
+    private double samplerTurnDegrees = 0;
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
@@ -57,8 +58,15 @@ public class HangTeamMarkerAuto extends LinearOpMode {
         robot.drive(.5, -.5, .5, -.5, 300);
         sleep(250);
         robot.moveTicks(200, .35, 2000);
-        sleep(1250);
-        robot.strafeTicks(3000, .9, 7000);
+        sleep(1000);
+        samplerTurnDegrees = robot.getSamplerTurnDegrees();
+        robot.rotate(samplerTurnDegrees, .5, 3000);
+        if (samplerTurnDegrees != 0) sleep(1000);
+        robot.strafeTicks(2000, .9, 7000);
+        if (samplerTurnDegrees != 0) sleep(1000);
+        robot.rotate(-samplerTurnDegrees, .5, 3000);
+        if (samplerTurnDegrees != 0) sleep(1000);
+        robot.strafeTicks(1000, .9, 7000);
         robot.markerServo(RobotConstants.MARKERSERVO_DROP);
         sleep(500);
         robot.rotate(42.5, .5, 3000);
