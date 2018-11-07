@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.chassis.Robot;
+import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
@@ -60,16 +61,24 @@ public class HangTeamMarkerAuto extends LinearOpMode {
         robot.moveTicks(200, .35, 2000);
         sleep(1000);
         samplerTurnDegrees = robot.getSamplerTurnDegrees();
-        robot.rotate(samplerTurnDegrees, .5, 3000);
-        if (samplerTurnDegrees != 0) sleep(1000);
-        robot.strafeTicks(2000, .9, 7000);
-        if (samplerTurnDegrees != 0) sleep(1000);
-        robot.rotate(-samplerTurnDegrees, .5, 3000);
-        if (samplerTurnDegrees != 0) sleep(1000);
-        robot.strafeTicks(1000, .9, 7000);
+        if (samplerTurnDegrees != 0) {
+            robot.rotate(samplerTurnDegrees, .5, 3000);
+            sleep(750);
+            robot.strafeTicks(2250, .9, 7000);
+            sleep(750);
+            robot.rotate(-2.0 * samplerTurnDegrees, .5, 3000);
+            sleep(750);
+            robot.strafeTicks(1250, .9, 5000);
+        } else {
+            robot.strafeTicks(3000, .9, 7000);
+        }
         robot.markerServo(RobotConstants.MARKERSERVO_DROP);
         sleep(500);
-        robot.rotate(42.5, .5, 3000);
+        if (samplerTurnDegrees != 0) {
+            robot.rotate(FtcUtils.sign(samplerTurnDegrees) * 15.0, .5, 3000);
+        } else {
+            robot.rotate(42.5, .5, 3000);
+        }
         robot.moveTicks(-3200, .6, 10000);
         robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
     }
