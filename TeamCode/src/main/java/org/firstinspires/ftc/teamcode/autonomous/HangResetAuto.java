@@ -36,33 +36,15 @@ import org.firstinspires.ftc.teamcode.chassis.Robot;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
-@Autonomous(name="Hang Team Marker Auto", group = "Autonomous")
-public class HangTeamMarkerAuto extends LinearOpMode {
+@Autonomous(name="Reset Hang ", group = "Autonomous")
+public class HangResetAuto extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
-        robot.init(hardwareMap, this, true, true);
-        while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
-            telemetry.addData("Status", "waiting for calibration");
-            telemetry.update();
-            idle();
-        }
-        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
+        robot.init(hardwareMap, this, false);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.hangTicks(15000, 1, 10000);
-        sleep(500);
-        robot.drive(.5, -.5, .5, -.5, 300);
-        sleep(250);
-        robot.moveTicks(200, .35, 2000);
-        sleep(1250);
-        robot.strafeTicks(3000, .9, 7000);
-        robot.markerServo(RobotConstants.MARKERSERVO_DROP);
-        sleep(500);
-        robot.rotate(42.5, .5, 3000);
-        robot.moveTicks(-3200, .6, 10000);
-        robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
+        robot.hangTicks(15000, -1, 10000);
     }
 }

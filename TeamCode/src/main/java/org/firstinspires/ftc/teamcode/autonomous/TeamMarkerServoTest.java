@@ -46,7 +46,7 @@ public class TeamMarkerServoTest extends LinearOpMode {
         telemetry.update();
         waitForStart();
         robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
-        sleep(3000);
+        sleep(2000);
         robot.markerServo(RobotConstants.MARKERSERVO_DROP);
     }
 }

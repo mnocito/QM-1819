@@ -40,6 +40,7 @@ public class Robot {
         hwMap = ahwMap;
         FR = hwMap.get(DcMotor.class, "FR");
         imu = new IMU();
+        sampler = new Sampler();
         FL = hwMap.get(DcMotor.class, "FL");
         nom = hwMap.get(DcMotor.class, "nom");
         extend = hwMap.get(DcMotor.class, "extend");

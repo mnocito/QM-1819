@@ -22,7 +22,7 @@ public class TestDrive extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap, this, false);
-        robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
+        robot.nomServo(RobotConstants.NOMSERVO_UP);
         robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
         telemetry.addData("Status", "Initialization bas been completed");
         telemetry.update();
@@ -45,9 +45,9 @@ public class TestDrive extends LinearOpMode {
             }
 
             if (FtcUtils.scale(gamepad2.right_trigger, 0, 1) > RobotConstants.threshold) {
-                robot.nom(.6);
+                robot.nom(1);
             } else if (FtcUtils.scale(gamepad2.left_trigger, 0, 1) > RobotConstants.threshold) {
-                robot.nom(-.6);
+                robot.nom(-1);
             } else {
                 robot.nom(0);
             }
@@ -57,7 +57,7 @@ public class TestDrive extends LinearOpMode {
                 robot.catapult(0);
             }
             if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold) {
-                robot.extend(FtcUtils.motorScale(gamepad2.left_stick_y));
+                robot.extend(FtcUtils.sign(gamepad2.left_stick_y));
             } else {
                 robot.extend(0);
             }
