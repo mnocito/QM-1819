@@ -37,49 +37,18 @@ import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
-@Autonomous(name="Hang Team Marker Auto", group = "Autonomous")
-public class HangTeamMarkerAuto extends LinearOpMode {
+@Autonomous(name="Vision Test", group = "Autonomous")
+public class VisionTest extends LinearOpMode {
     private Robot robot = new Robot();
     private double samplerTurnDegrees = 0;
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "waiting for imu to init");
+        telemetry.addData("Status", "waiting for vision to init");
         telemetry.update();
-        robot.init(hardwareMap, this, true, true);
-        while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
-            telemetry.addData("Status", "waiting for calibration");
-            telemetry.update();
-            idle();
-        }
-        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
+        robot.init(hardwareMap, this, false, true);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.hangTicks(15000, 1, 10000);
-        sleep(500);
-        robot.drive(.5, -.5, .5, -.5, 300);
-        sleep(250);
-        robot.moveTicks(200, .35, 2000);
-        sleep(1000);
-        samplerTurnDegrees = robot.getSamplerTurnDegrees(10000);
-        if (samplerTurnDegrees != 0) {
-            robot.rotate(samplerTurnDegrees, .5, 3000);
-            sleep(750);
-            robot.strafeTicks(2250, .9, 7000);
-            sleep(750);
-            robot.rotate(-2.0 * samplerTurnDegrees, .5, 3000);
-            sleep(750);
-            robot.strafeTicks(1250, .9, 5000);
-        } else {
-            robot.strafeTicks(3000, .9, 7000);
-        }
-        robot.markerServo(RobotConstants.MARKERSERVO_DROP);
-        sleep(500);
-        if (samplerTurnDegrees != 0) {
-            robot.rotate(FtcUtils.sign(samplerTurnDegrees) * samplerTurnDegrees + 15.0, .5, 3000);
-        } else {
-            robot.rotate(42.5, .5, 3000);
-        }
-        robot.moveTicks(-3200, .6, 10000);
-        robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
+        samplerTurnDegrees = robot.getSamplerTurnDegrees(20000);
+        while (opModeIsActive()) idle();
     }
 }

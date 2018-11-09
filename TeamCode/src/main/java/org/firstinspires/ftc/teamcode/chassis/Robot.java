@@ -180,8 +180,8 @@ public class Robot {
         context.telemetry.addData("status", "done");
         context.telemetry.update();
     }
-    public double getSamplerTurnDegrees() {
-        switch (sampler.getPosition(10000)) {
+    public double getSamplerTurnDegrees(int timeout) {
+        switch (sampler.getPosition(timeout)) {
             case LEFT:
                 return -30.0;
             case RIGHT:
