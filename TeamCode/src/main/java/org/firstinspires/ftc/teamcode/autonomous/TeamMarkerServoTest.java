@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.chassis.Robot;
@@ -37,6 +38,7 @@ import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
 @Autonomous(name="Team Marker Servo Test", group = "Autonomous")
+@Disabled
 public class TeamMarkerServoTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {

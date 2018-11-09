@@ -37,8 +37,8 @@ import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
-@Autonomous(name="Hang Team Marker Auto", group = "Autonomous")
-public class HangTeamMarkerAuto extends LinearOpMode {
+@Autonomous(name="BlueDepotAuto", group = "Autonomous")
+public class BlueDepotAuto extends LinearOpMode {
     private Robot robot = new Robot();
     private double samplerTurnDegrees = 0;
     public void runOpMode() throws InterruptedException {
