@@ -33,7 +33,6 @@ public class TestDrive extends LinearOpMode {
             lefty = FtcUtils.motorScale(gamepad1.left_stick_y) * RobotConstants.sensitivity;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
             leftx = FtcUtils.motorScale(gamepad1.left_stick_x) * RobotConstants.sensitivity;
-
             if (FtcUtils.abs(lefty) > RobotConstants.threshold) {
                 robot.drive(-lefty, -lefty, -lefty, -lefty);
             } else if (FtcUtils.abs(leftx) > RobotConstants.threshold) {
@@ -43,7 +42,6 @@ public class TestDrive extends LinearOpMode {
             } else {
                 robot.stop();
             }
-
             if (FtcUtils.scale(gamepad2.right_trigger, 0, 1) > RobotConstants.threshold) {
                 robot.nom(1);
             } else if (FtcUtils.scale(gamepad2.left_trigger, 0, 1) > RobotConstants.threshold) {
@@ -56,7 +54,7 @@ public class TestDrive extends LinearOpMode {
             } else {
                 robot.catapult(0);
             }
-            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold) {
+            if (robot.canExtend() && FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold) {
                 robot.extend(FtcUtils.sign(gamepad2.left_stick_y));
             } else {
                 robot.extend(0);
@@ -76,9 +74,9 @@ public class TestDrive extends LinearOpMode {
                     robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
                 }
             }
-            if (gamepad2.dpad_up) {
+            if (robot.canHang() && gamepad2.dpad_up) {
                 robot.hang(1);
-            } else if (gamepad2.dpad_down) {
+            } else if (robot.canHang() && gamepad2.dpad_down) {
                 robot.hang(-1);
             } else {
                 robot.hang(0);

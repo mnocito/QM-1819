@@ -36,7 +36,7 @@ import org.firstinspires.ftc.teamcode.chassis.Robot;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
-@Autonomous(name="Reset Hang ", group = "Autonomous")
+@Autonomous(name="Reset Hang", group = "Autonomous")
 public class HangResetAuto extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
@@ -45,6 +45,6 @@ public class HangResetAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.hangTicks(15000, -1, 10000);
+        robot.hangTicks(14500, -1, 10000);
     }
 }

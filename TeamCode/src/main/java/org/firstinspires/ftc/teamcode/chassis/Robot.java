@@ -23,6 +23,7 @@ public class Robot {
     private Rev2mDistanceSensor sensor1;
     private int encoderPos = 0;
     private int hangEncoderPos = 0;
+    private int extendEncoderPos = 0;
     private DcMotor FR = null;
     private DcMotor FL = null;
     private DcMotor BR = null;
@@ -162,6 +163,12 @@ public class Robot {
     public void extendTicks(int ticks, double pow, int timeout) {
         runEncoderMotor(extend, ticks, pow, timeout);
     }
+    public boolean canExtend() {
+        return getExtendTicks() < RobotConstants.MAX_EXTEND_TICKS;
+    }
+    public boolean canHang() {
+        return getHangTicks() < RobotConstants.MAX_HANG_TICKS;
+    }
     private void runEncoderMotor(DcMotor motor, int ticks, double pow, int timeout) {
         int encoderPos = motor.getCurrentPosition();
         int currentPos = motor.getCurrentPosition() - encoderPos;
@@ -194,9 +201,17 @@ public class Robot {
     }
     public void resetTicks() {
         encoderPos = BL.getCurrentPosition();
+        hangEncoderPos = hang.getCurrentPosition();
+        extendEncoderPos = extend.getCurrentPosition();
     }
     public int getTicks() {
         return BL.getCurrentPosition() - encoderPos;
+    }
+    public int getHangTicks() {
+        return hang.getCurrentPosition() - hangEncoderPos;
+    }
+    public int getExtendTicks() {
+        return extend.getCurrentPosition() - extendEncoderPos;
     }
     public void nom(double power) {
         nom.setPower(power);

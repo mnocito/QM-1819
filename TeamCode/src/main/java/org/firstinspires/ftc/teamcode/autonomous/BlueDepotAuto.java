@@ -54,7 +54,7 @@ public class BlueDepotAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.hangTicks(15000, 1, 10000);
+        robot.hangTicks(14500, 1, 10000);
         sleep(500);
         robot.drive(.5, -.5, .5, -.5, 300);
         sleep(250);
