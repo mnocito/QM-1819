@@ -50,7 +50,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * is explained below.
  */
 @TeleOp(name = "Concept: TensorFlow Object Detection Webcam", group = "Concept")
-@Disabled
+//@Disabled
 public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
@@ -68,7 +68,7 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
      * Once you've obtained a license key, copy the string from the Vuforia web site
      * and paste it in to your code on the next line, between the double quotes.
      */
-    private static final String VUFORIA_KEY = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+    private static final String VUFORIA_KEY = "AUbqP2X/////AAABmanjyi8qNEe4lL7GfntMCVJ562TM830n+NlX1vnENsuMEzeIsEDF/qyeNwM4x+DziWQsfsvpp0SxW5eKQPYRjN7Ie5rdVCCE//IJGv15r5yrTflq/EBo8JRb6VT97RINry7r0rXsCsm6OaB4CgiboJMt0sWuPLL4mCEgREvCSAOjaHcu5vIklq1fS4i8F89EyPm6J/ctw1ePPGUaZyT7vqnGb1P3gF+oELUbkXG/ui3PAeuOXuhbe2eJ0CATQWjV5P4C4v1cL4nhcYjA0Npe/KLQplbQSr4iD141V7dX8rWNYltQj3oSg2TyrMR6bOse6H+06lRfCB/s83pd19/U4gur0LYYJI5lHHVRQh9/n87d";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -156,7 +156,7 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "webcam");
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);

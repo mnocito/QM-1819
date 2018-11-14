@@ -20,6 +20,7 @@ public class IMU {
         parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.mode = BNO055IMU.SensorMode.COMPASS;
         imu.initialize(parameters);
         resetAngle();
     }
@@ -33,11 +34,13 @@ public class IMU {
         lastAngles = currentAngles;
         return globalAngle;
     }
+    public double getRawHeading() {
+        return (imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle+360.0)%360.0;
+    }
     public boolean isGyroCalibrated() {
         return imu.isGyroCalibrated();
     }
     public double getAngle() {
         return globalAngle;
     }
-
 }

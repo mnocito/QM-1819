@@ -38,7 +38,7 @@ import org.firstinspires.ftc.teamcode.chassis.Robot;
 
 
 @Autonomous(name="Gyro Auto Test", group = "Autonomous")
-@Disabled
+//@Disabled
 public class GyroAutoTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
@@ -53,6 +53,7 @@ public class GyroAutoTest extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.rotate(40, .3, 2500);
+        //robot.rotate(120, .5, 4000);
+        robot.rotateTest2(120, .4);
     }
 }

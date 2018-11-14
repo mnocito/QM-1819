@@ -57,7 +57,7 @@ public class Robot {
         BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        nom.setDirection(DcMotorSimple.Direction.REVERSE);
+        nom.setDirection(DcMotorSimple.Direction.FORWARD);
         hang.setDirection(DcMotorSimple.Direction.REVERSE);
         extend.setDirection(DcMotorSimple.Direction.FORWARD);
         catapult.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -163,11 +163,20 @@ public class Robot {
     public void extendTicks(int ticks, double pow, int timeout) {
         runEncoderMotor(extend, ticks, pow, timeout);
     }
-    public boolean canExtend() {
-        return getExtendTicks() < RobotConstants.MAX_EXTEND_TICKS;
+    public boolean canExtendUp() {
+        return getExtendTicks() <= RobotConstants.MAX_EXTEND_TICKS && context.gamepad2.left_stick_y < 0;
     }
-    public boolean canHang() {
-        return getHangTicks() < RobotConstants.MAX_HANG_TICKS;
+    public boolean canExtendDown() {
+        return getExtendTicks() >= -50 && context.gamepad2.left_stick_y > 0;
+    }
+    public boolean canExtend() {
+        return canExtendUp() || canExtendDown();
+    }
+    public boolean canHangUp() {
+        return getHangTicks() <= RobotConstants.MAX_HANG_TICKS;
+    }
+    public boolean canHangDown() {
+        return getHangTicks() >= 0;
     }
     private void runEncoderMotor(DcMotor motor, int ticks, double pow, int timeout) {
         int encoderPos = motor.getCurrentPosition();
@@ -207,11 +216,34 @@ public class Robot {
     public int getTicks() {
         return BL.getCurrentPosition() - encoderPos;
     }
+    public void rotateTest2(double degrees, double pow) {
+        double heading = imu.getRawHeading();
+        context.telemetry.addData("degrees", degrees);
+        degrees = FtcUtils.normalizeDegrees(heading + degrees);
+        context.telemetry.addData("degrees 2", degrees);
+        context.telemetry.addData("heading", heading);
+        context.telemetry.update();
+        context.sleep(1500);
+        double diff = heading - degrees;
+        context.telemetry.addData("diff", diff);
+        context.telemetry.update();
+        context.sleep(1500);
+        while (FtcUtils.abs(heading - degrees) > 5 && context.opModeIsActive()) {
+            drive(-FtcUtils.sign(diff) * pow, -FtcUtils.sign(diff) * pow, FtcUtils.sign(diff) * pow, FtcUtils.sign(diff) * pow);
+            heading = imu.getRawHeading();
+            diff = heading - degrees;
+            context.telemetry.addData("diff", diff);
+            context.telemetry.addData("heading", heading);
+            context.telemetry.addData("degrees", degrees);
+            context.telemetry.update();
+        }
+
+    }
     public int getHangTicks() {
         return hang.getCurrentPosition() - hangEncoderPos;
     }
     public int getExtendTicks() {
-        return extend.getCurrentPosition() - extendEncoderPos;
+        return -(extend.getCurrentPosition() - extendEncoderPos);
     }
     public void nom(double power) {
         nom.setPower(power);

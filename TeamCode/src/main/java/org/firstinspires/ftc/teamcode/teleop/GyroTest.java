@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 @TeleOp(name = "Gyro test")
-@Disabled
+//@Disabled
 public class GyroTest extends LinearOpMode {
     private Robot robot = new Robot();
     private double rightx = 0;
@@ -25,7 +25,7 @@ public class GyroTest extends LinearOpMode {
             lefty = FtcUtils.motorScale(gamepad1.left_stick_y) * RobotConstants.sensitivity;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
             leftx = FtcUtils.motorScale(gamepad1.left_stick_x) * RobotConstants.sensitivity;
-            telemetry.addData("gyro", robot.imu.getAngle());
+            telemetry.addData("gyro", robot.imu.getRawHeading());
             robot.imu.updateAngle();
             if (FtcUtils.abs(lefty) > RobotConstants.threshold) {
                 robot.drive(-lefty, -lefty, -lefty, -lefty);

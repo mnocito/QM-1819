@@ -30,6 +30,11 @@ public class TestDrive extends LinearOpMode {
         while (!isStopRequested() && opModeIsActive()) {
             robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
             telemetry.addData("nom servo pos", robot.nomServoPos());
+            telemetry.addData("extend encoder ticks", robot.getExtendTicks());
+            telemetry.addData("hang encoder ticks", robot.getHangTicks());
+            telemetry.addData("stick", gamepad2.left_stick_y);
+            telemetry.addData("can extend up", robot.canExtendUp());
+            telemetry.addData("can extend down", robot.canExtendDown());
             lefty = FtcUtils.motorScale(gamepad1.left_stick_y) * RobotConstants.sensitivity;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
             leftx = FtcUtils.motorScale(gamepad1.left_stick_x) * RobotConstants.sensitivity;
@@ -54,8 +59,12 @@ public class TestDrive extends LinearOpMode {
             } else {
                 robot.catapult(0);
             }
-            if (robot.canExtend() && FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold) {
-                robot.extend(FtcUtils.sign(gamepad2.left_stick_y));
+            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold && robot.canExtend()) {
+                if (robot.canExtendUp()) {
+                    robot.extend(-1);
+                } else if (robot.canExtendDown()) {
+                    robot.extend(1);
+                }
             } else {
                 robot.extend(0);
             }
@@ -74,9 +83,9 @@ public class TestDrive extends LinearOpMode {
                     robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
                 }
             }
-            if (robot.canHang() && gamepad2.dpad_up) {
+            if (robot.canHangUp() && gamepad2.dpad_up) {
                 robot.hang(1);
-            } else if (robot.canHang() && gamepad2.dpad_down) {
+            } else if (robot.canHangDown() && gamepad2.dpad_down) {
                 robot.hang(-1);
             } else {
                 robot.hang(0);

@@ -9,12 +9,12 @@ public class RobotConstants {
     public static double MARKERSERVO_HOLD = .22;
     public static double LOWEST_MOTOR_POWER = .2;
     public static double LOWEST_STRAFE_POWER = .45;
-    public static double LOWEST_TURN_POWER = .15;
+    public static double LOWEST_TURN_POWER = .225;
     public static double threshold = .5;
     public static double sensitivity = .9;
     public static double CATAPULT_MOTOR_POWER = .6;
-    public static int MAX_EXTEND_TICKS = 6000;
-    public static int MAX_HANG_TICKS = 15000;
+    public static int MAX_EXTEND_TICKS = 7000;
+    public static int MAX_HANG_TICKS = 14500;
     public enum Position {
         LEFT, RIGHT, CENTER
     }
