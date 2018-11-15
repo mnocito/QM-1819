@@ -118,6 +118,33 @@ public class Robot {
         context.telemetry.addData("status", "done");
         context.telemetry.update();
     }
+    private void strafeTicksNoStopping(int ticks, double pow, int timeout) {
+        resetTicks();
+        long startTime = System.currentTimeMillis();
+        long currentTime = startTime;
+        // While we still have ticks to drive AND we haven't exceeded the time limit, move in the specified direction.
+        while (FtcUtils.abs(getTicks()) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
+            drive(FtcUtils.sign(ticks) * FtcUtils.abs(pow), -FtcUtils.sign(ticks) * FtcUtils.abs(pow), FtcUtils.sign(ticks) * FtcUtils.abs(pow), -FtcUtils.sign(ticks) * FtcUtils.abs(pow));
+            currentTime = System.currentTimeMillis();
+            context.telemetry.addData("Target", ticks);
+            context.telemetry.addData("Current", getTicks());
+            context.telemetry.addData("pow", pow);
+            context.telemetry.update();
+        }
+        context.telemetry.addData("status", "done");
+        context.telemetry.update();
+    }
+    public void strafeTicksGradually(int ticks, double pow, int timeout) {
+        if (ticks >= 120) {
+            strafeTicksNoStopping(30,((pow - RobotConstants.LOWEST_TURN_POWER) / 5.0) * 1.0 + RobotConstants.LOWEST_TURN_POWER, 500);
+            strafeTicksNoStopping(30,((pow - RobotConstants.LOWEST_TURN_POWER) / 5.0) * 2.0 + RobotConstants.LOWEST_TURN_POWER, 500);
+            strafeTicksNoStopping(30,((pow - RobotConstants.LOWEST_TURN_POWER) / 5.0) * 3.0 + RobotConstants.LOWEST_TURN_POWER, 500);
+            strafeTicksNoStopping(30,((pow - RobotConstants.LOWEST_TURN_POWER) / 5.0) * 4.0 + RobotConstants.LOWEST_TURN_POWER, 500);
+            strafeTicks(ticks - 120, pow, timeout);
+        } else {
+            strafeTicks(ticks, pow, timeout);
+        }
+    }
     public void drive(double fl, double bl, double fr, double br) {
         FL.setPower(fl);
         BL.setPower(bl);
@@ -156,6 +183,22 @@ public class Robot {
         stop();
         context.telemetry.addData("status", "done");
         context.telemetry.update();
+    }
+    public void deploy() {
+        while (context.opModeIsActive()) {
+            hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
+            context.sleep(500);
+            drive(.5, -.5, .5, -.5, 300);
+            context.sleep(250);
+            moveTicks(-100, .35, 2000);
+            context.sleep(500);
+            strafeTicks(400, .6, 2000);
+            context.sleep(500);
+            moveTicks(150, .35, 2000);
+            context.sleep(500);
+            rotate(-90, .6, 4000);
+            break;
+        }
     }
     public void hangTicks(int ticks, double pow, int timeout) {
         runEncoderMotor(hang, ticks, pow, timeout);
@@ -215,29 +258,6 @@ public class Robot {
     }
     public int getTicks() {
         return BL.getCurrentPosition() - encoderPos;
-    }
-    public void rotateTest2(double degrees, double pow) {
-        double heading = imu.getRawHeading();
-        context.telemetry.addData("degrees", degrees);
-        degrees = FtcUtils.normalizeDegrees(heading + degrees);
-        context.telemetry.addData("degrees 2", degrees);
-        context.telemetry.addData("heading", heading);
-        context.telemetry.update();
-        context.sleep(1500);
-        double diff = heading - degrees;
-        context.telemetry.addData("diff", diff);
-        context.telemetry.update();
-        context.sleep(1500);
-        while (FtcUtils.abs(heading - degrees) > 5 && context.opModeIsActive()) {
-            drive(-FtcUtils.sign(diff) * pow, -FtcUtils.sign(diff) * pow, FtcUtils.sign(diff) * pow, FtcUtils.sign(diff) * pow);
-            heading = imu.getRawHeading();
-            diff = heading - degrees;
-            context.telemetry.addData("diff", diff);
-            context.telemetry.addData("heading", heading);
-            context.telemetry.addData("degrees", degrees);
-            context.telemetry.update();
-        }
-
     }
     public int getHangTicks() {
         return hang.getCurrentPosition() - hangEncoderPos;

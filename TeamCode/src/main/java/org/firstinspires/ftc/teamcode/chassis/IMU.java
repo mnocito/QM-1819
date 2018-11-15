@@ -10,32 +10,44 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 
 public class IMU {
-    private Orientation lastAngles;
-    private Orientation currentAngles;
     private double globalAngle = 0;
+    private double rotationAmt = 0;
+    private double lastHeading = -1;
     private BNO055IMU imu;
+    private double lastAngle;
+    private double currentAngle;
     public void init(HardwareMap hwMap, String imuname) {
         BNO055IMU.Parameters parameters;
         imu = hwMap.get(BNO055IMU.class, imuname);
         parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.mode = BNO055IMU.SensorMode.COMPASS;
         imu.initialize(parameters);
         resetAngle();
     }
     public void resetAngle() {
-        lastAngles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        lastAngle = getRolledHeading();
         globalAngle = 0;
     }
     public double updateAngle() {
-        currentAngles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        globalAngle += FtcUtils.normalizeDegrees(currentAngles.firstAngle - lastAngles.firstAngle);
-        lastAngles = currentAngles;
+        currentAngle = getRolledHeading();
+        globalAngle += currentAngle - lastAngle;
+        lastAngle = currentAngle;
         return globalAngle;
     }
-    public double getRawHeading() {
-        return (imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle+360.0)%360.0;
+    private double getRawHeading() {
+        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle+180.0;
+    }
+    // create a heading that doesn't rollover at 360 or at 0
+    public double getRolledHeading() {
+        double heading = 360.0 - getRawHeading();
+        if (lastHeading < 100 && heading > 300) {
+            rotationAmt--;
+        } else if (heading < 100 && lastHeading > 300) {
+            rotationAmt++;
+        }
+        lastHeading = heading;
+        return heading + rotationAmt * 360.0;
     }
     public boolean isGyroCalibrated() {
         return imu.isGyroCalibrated();

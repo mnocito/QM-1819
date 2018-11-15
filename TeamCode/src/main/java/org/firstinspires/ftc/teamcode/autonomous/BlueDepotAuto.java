@@ -44,7 +44,7 @@ public class BlueDepotAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
-        robot.init(hardwareMap, this, true, true);
+        robot.init(hardwareMap, this, true, false);
         while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
             telemetry.addData("Status", "waiting for calibration");
             telemetry.update();
@@ -54,20 +54,7 @@ public class BlueDepotAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.hangTicks(14500, 1, 10000);
-        sleep(500);
-        robot.drive(.5, -.5, .5, -.5, 300);
-        sleep(250);
-        robot.moveTicks(-100, .35, 2000);
-        sleep(600);
-        robot.strafeTicks(400, .6, 2000);
-        sleep(600);
-        robot.moveTicks(150, .35, 2000);
-        sleep(600);
-        robot.rotate(-100, .6, 4000);
-        sleep(600);
-        robot.moveTicks(-200, .35, 2000);
-
+        robot.deploy();
         samplerTurnDegrees = 0/*robot.getSamplerTurnDegrees(6000)*/;
         if (samplerTurnDegrees != 0) {
             robot.rotate(samplerTurnDegrees, .5, 3000);

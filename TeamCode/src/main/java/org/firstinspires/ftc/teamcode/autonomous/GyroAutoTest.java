@@ -54,6 +54,13 @@ public class GyroAutoTest extends LinearOpMode {
         telemetry.update();
         waitForStart();
         //robot.rotate(120, .5, 4000);
-        robot.rotateTest2(120, .4);
+        robot.rotate(-90, .4, 3500);
+        sleep(1000);
+        robot.rotate(90, .4, 3500);
+        sleep(1000);
+        robot.rotate(-90, .4, 3500);
+        sleep(1000);
+        robot.rotate(90, .4, 3500);
+        sleep(1000);
     }
 }

@@ -21,11 +21,13 @@ public class GyroTest extends LinearOpMode {
         telemetry.addData("Status", "Initialization bas been completed");
         telemetry.update();
         waitForStart();
+        robot.imu.resetAngle();
         while (!isStopRequested() && opModeIsActive()) {
             lefty = FtcUtils.motorScale(gamepad1.left_stick_y) * RobotConstants.sensitivity;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
             leftx = FtcUtils.motorScale(gamepad1.left_stick_x) * RobotConstants.sensitivity;
-            telemetry.addData("gyro", robot.imu.getRawHeading());
+            telemetry.addData("rolled", robot.imu.getRolledHeading());
+            telemetry.addData("global", robot.imu.getAngle());
             robot.imu.updateAngle();
             if (FtcUtils.abs(lefty) > RobotConstants.threshold) {
                 robot.drive(-lefty, -lefty, -lefty, -lefty);
