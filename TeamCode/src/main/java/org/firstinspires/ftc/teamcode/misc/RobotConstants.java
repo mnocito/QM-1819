@@ -10,7 +10,6 @@ public class RobotConstants {
     public static double LOWEST_MOTOR_POWER = .2;
     public static double LOWEST_STRAFE_POWER = .4;
     public static double LOWEST_TURN_POWER = .2;
-    public static double TURN_DEGREES_TOLERANCE = 5.0;
     public static double threshold = .5;
     public static double sensitivity = .9;
     public static double CATAPULT_MOTOR_POWER = .6;

@@ -40,7 +40,6 @@ public class FtcUtils {
     }
 
     public static double normalizeDegrees(double degrees) {
-        degrees = (degrees+360.0)%360.0;
-        return degrees;
+        return (degrees+360.0)%360.0;
     }
 }
