@@ -111,11 +111,202 @@ public class Sampler {
                                 return RobotConstants.Position.CENTER;
                             }
                         }
+                    } else if (updatedRecognitions.size() == 2) {
+                        context.telemetry.addData("using two minerals", "");
+                        context.telemetry.update();
+                        int goldMineralX = -1;
+                        int silverMineral1X = -1;
+                        int silverMineral2X = -1;
+                        for (Recognition recognition : updatedRecognitions) {
+                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                goldMineralX = (int) recognition.getLeft();
+                            } else if (silverMineral1X == -1) {
+                                silverMineral1X = (int) recognition.getLeft();
+                            } else {
+                                silverMineral2X = (int) recognition.getLeft();
+                            }
+                        }
+                        context.telemetry.addData("gold", goldMineralX);
+                        context.telemetry.addData("silver 1", silverMineral1X);
+                        context.telemetry.addData("silver 2", silverMineral2X);
+                        context.telemetry.update();
+                        if (goldMineralX != -1 && silverMineral1X != -1) {
+                            context.telemetry.addData("Gold Mineral X Position", goldMineralX);
+                            context.telemetry.update();
+                            if (goldMineralX < silverMineral1X) {
+                                if (goldMineralX < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
+                                    context.telemetry.update();
+                                    return RobotConstants.Position.LEFT;
+                                } else {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
+                                    context.telemetry.update();
+                                    return RobotConstants.Position.CENTER;
+                                }
+                            } else {
+                                if (silverMineral1X < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
+                                    context.telemetry.update();
+                                    return RobotConstants.Position.CENTER;
+                                } else {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
+                                    context.telemetry.update();
+                                    return RobotConstants.Position.LEFT;
+                                }
+                            }
+                        } else {
+                            context.telemetry.addData("Silver Mineral 1 X position", silverMineral1X);
+                            context.telemetry.addData("Silver Mineral 2 X position", silverMineral2X);
+                            context.telemetry.update();
+                            if (silverMineral1X > silverMineral2X) {
+                                int temp = silverMineral1X;
+                                silverMineral1X = silverMineral2X;
+                                silverMineral2X = temp;
+                            }
+                            if (silverMineral1X < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
+                                if (silverMineral2X > RobotConstants.RIGHT_MAX_PIXEL_VALUE) {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
+                                    context.telemetry.update();
+                                    return RobotConstants.Position.CENTER;
+                                } else {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.RIGHT);
+                                    context.telemetry.update();
+                                    return RobotConstants.Position.RIGHT;
+                                }
+                            } else {
+                                context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
+                                context.telemetry.update();
+                                return RobotConstants.Position.LEFT;
+                            }
+                        }
                     }
                 }
             }
             currentTime = System.currentTimeMillis();
         }
         return RobotConstants.Position.CENTER;
+    }
+    public void getPositionForever(int timeout) {
+        long startTime = System.currentTimeMillis();
+        long currentTime = startTime;
+        if (tfod != null) {
+            tfod.activate();
+        } else {
+            context.telemetry.addData("status", "tensorflow not enabled");
+            context.telemetry.update();
+        }
+        while (context.opModeIsActive() && currentTime - startTime < timeout) {
+            if (tfod != null) {
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                if (updatedRecognitions != null) {
+                    context.telemetry.addData("# Object Detected", updatedRecognitions.size());
+                    context.telemetry.update();
+                    if (updatedRecognitions.size() == 3) {
+                        int goldMineralX = -1;
+                        int silverMineral1X = -1;
+                        int silverMineral2X = -1;
+                        for (Recognition recognition : updatedRecognitions) {
+                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                goldMineralX = (int) recognition.getLeft();
+                            } else if (silverMineral1X == -1) {
+                                silverMineral1X = (int) recognition.getLeft();
+                            } else {
+                                silverMineral2X = (int) recognition.getLeft();
+                            }
+                        }
+                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
+                            if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
+                                if (tfod != null) tfod.shutdown();
+                                context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
+                                context.telemetry.update();
+                     //           return RobotConstants.Position.LEFT;
+                            } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
+                                if (tfod != null) tfod.shutdown();
+                                context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.RIGHT);
+                                context.telemetry.update();
+                      //          return RobotConstants.Position.RIGHT;
+                            } else {
+                                if (tfod != null) tfod.shutdown();
+                                context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
+                                context.telemetry.update();
+                     //           return RobotConstants.Position.CENTER;
+                            }
+                        }
+                    } else if (updatedRecognitions.size() == 2) {
+                        context.telemetry.addData("using two minerals", "");
+                        context.telemetry.update();
+                        context.sleep(1600);
+                        int goldMineralX = -1;
+                        int silverMineral1X = -1;
+                        int silverMineral2X = -1;
+                        for (Recognition recognition : updatedRecognitions) {
+                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                goldMineralX = (int) recognition.getLeft();
+                            } else if (silverMineral1X == -1) {
+                                silverMineral1X = (int) recognition.getLeft();
+                            } else {
+                                silverMineral2X = (int) recognition.getLeft();
+                            }
+                        }
+                        context.telemetry.addData("gold", goldMineralX);
+                        context.telemetry.addData("silver 1", silverMineral1X);
+                        context.telemetry.addData("silver 2", silverMineral2X);
+                        context.telemetry.update();
+                        context.sleep(3000);
+                        if (goldMineralX != -1 && silverMineral1X != -1) {
+                            context.telemetry.addData("Gold Mineral X Position", goldMineralX);
+                            context.telemetry.update();
+                            if (goldMineralX < silverMineral1X) {
+                                if (goldMineralX < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
+                                    context.telemetry.update();
+                      //              return RobotConstants.Position.LEFT;
+                                } else {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
+                                    context.telemetry.update();
+                       //             return RobotConstants.Position.CENTER;
+                                }
+                            } else {
+                                if (silverMineral1X < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
+                                    context.telemetry.update();
+                       //             return RobotConstants.Position.CENTER;
+                                } else {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
+                                    context.telemetry.update();
+                        //            return RobotConstants.Position.LEFT;
+                                }
+                            }
+                        } else {
+                            context.telemetry.addData("Silver Mineral 1 X position", silverMineral1X);
+                            context.telemetry.addData("Silver Mineral 2 X position", silverMineral2X);
+                            context.telemetry.update();
+                            if (silverMineral1X > silverMineral2X) {
+                                int temp = silverMineral1X;
+                                silverMineral1X = silverMineral2X;
+                                silverMineral2X = temp;
+                            }
+                            if (silverMineral1X < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
+                                if (silverMineral2X > RobotConstants.RIGHT_MAX_PIXEL_VALUE) {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
+                                    context.telemetry.update();
+                          //          return RobotConstants.Position.CENTER;
+                                } else {
+                                    context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.RIGHT);
+                                    context.telemetry.update();
+                         //           return RobotConstants.Position.RIGHT;
+                                }
+                            } else {
+                                context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
+                                context.telemetry.update();
+                      //          return RobotConstants.Position.LEFT;
+                            }
+                        }
+                    }
+                }
+            }
+            currentTime = System.currentTimeMillis();
+        }
+    //    return RobotConstants.Position.CENTER;
     }
 }

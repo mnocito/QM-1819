@@ -47,7 +47,7 @@ public class VisionTest extends LinearOpMode {
         telemetry.update();
         waitForStart();
         telemetry.addData("has webcam", canSample);
-        sampler.getPosition(Integer.MAX_VALUE);
+        sampler.getPositionForever(Integer.MAX_VALUE);
         telemetry.update();
         while (opModeIsActive()) idle();
     }

@@ -37,14 +37,14 @@ import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
-@Autonomous(name="BlueDepotAuto", group = "Autonomous")
-public class BlueDepotAuto extends LinearOpMode {
+@Autonomous(name="Depot Auto", group = "Autonomous")
+public class DepotAuto extends LinearOpMode {
     private Robot robot = new Robot();
     private double samplerTurnDegrees = 0;
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
-        robot.init(hardwareMap, this, true, false);
+        robot.init(hardwareMap, this, true, true);
         while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
             telemetry.addData("Status", "waiting for calibration");
             telemetry.update();
@@ -54,38 +54,54 @@ public class BlueDepotAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
+        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
         robot.deploy();
-        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(6000);
+        robot.rotate(-(samplerTurnDegrees + 90.0), .5, 3000);
         if (samplerTurnDegrees != 0) {
-            robot.rotate(samplerTurnDegrees, .5, 3000);
-            sleep(750);
-            robot.moveTicks(2250, .9, 7000);
-            sleep(750);
-            robot.rotate(-2.0 * samplerTurnDegrees, .5, 3000);
-            sleep(750);
-            robot.moveTicks(1250, .9, 5000);
+            sleep(250);
+            robot.moveTicks(-1400, .5, 4000);
+            robot.moveTicks(150, .5, 4000);
+            sleep(250);
+            robot.rotate(2.0 * samplerTurnDegrees + 10.0, .5, 3000);
+            sleep(250);
+            if (samplerTurnDegrees == 30) {
+                robot.moveTicks(-1250, .5, 5000);
+                robot.dropTeamMarker();
+                robot.rotate(90, .5, 3000);
+                robot.moveTicks(-300, .6, 5000);
+                robot.strafeTicks(1300, .5, 3000);
+                robot.strafeTicks(-200, .5, 3000);
+                robot.moveTicks(-2300, .6, 5000);
+            } else {
+                robot.moveTicks(-1100, .5, 5000);
+                robot.rotate(90, .5, 3000);
+                robot.dropTeamMarker();
+                robot.strafeTicks(-200, .5, 3000);
+                robot.rotate(75, .5, 3000);
+                robot.moveTicks(-100, .6, 5000);
+                robot.strafeTicks(1300, .5, 3000);
+                robot.strafeTicks(-200, .5, 3000);
+                robot.moveTicks(-2300, .6, 5000);
+            }
         } else {
             sleep(600);
             robot.moveTicks(-1600, .5, 5000);
             sleep(600);
             robot.rotate(80.5, .5, 3000);
-        }
-        sleep(200);
-        robot.strafeTicks(300, .5, 1000);
-        sleep(200);
-        robot.markerServo(RobotConstants.MARKERSERVO_DROP);
-        sleep(200);
-        robot.markerServo(RobotConstants.MARKERSERVO_RETRACTED);
-        robot.strafeTicks(-300, .5, 1000);
-        sleep(200);
-        if (samplerTurnDegrees != 0) {
-            robot.rotate(FtcUtils.sign(samplerTurnDegrees) * samplerTurnDegrees + 15.0, .5, 3000);
-        } else {
+            sleep(200);
+            robot.strafeTicks(300, .5, 1000);
+            sleep(200);
+            robot.markerServo(RobotConstants.MARKERSERVO_DROP);
+            sleep(200);
+            robot.markerServo(RobotConstants.MARKERSERVO_RETRACTED);
+            robot.strafeTicks(-300, .5, 1000);
             robot.rotate(60, .5, 3000);
+            robot.moveTicks(-300, .6, 5000);
+            robot.strafeTicks(1200, .5, 3000);
+            robot.strafeTicks(-200, .5, 3000);
+            robot.moveTicks(-2300, .6, 5000);
         }
-        robot.moveTicks(-300, .6, 5000);
-        robot.strafeTicks(1300, .5, 3000);
-        robot.moveTicks(-2300, .6, 5000);
+        sleep(200);
         robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
         sleep(2000);
     }

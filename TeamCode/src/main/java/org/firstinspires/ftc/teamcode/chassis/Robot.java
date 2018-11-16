@@ -187,16 +187,22 @@ public class Robot {
     public void deploy() {
         while (context.opModeIsActive()) {
             hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
-            context.sleep(500);
             drive(.5, -.5, .5, -.5, 300);
             context.sleep(250);
             moveTicks(-100, .35, 2000);
-            context.sleep(500);
+            context.sleep(250);
             strafeTicks(400, .6, 2000);
-            context.sleep(500);
+            context.sleep(250);
             moveTicks(100, .35, 2000);
-            context.sleep(500);
-            rotate(-90, .6, 4000);
+            context.sleep(250);
+            break;
+        }
+    }
+    public void dropTeamMarker() {
+        while (context.opModeIsActive()) {
+            markerServo(RobotConstants.MARKERSERVO_DROP);
+            context.sleep(200);
+            markerServo(RobotConstants.MARKERSERVO_RETRACTED);
             break;
         }
     }
@@ -242,9 +248,9 @@ public class Robot {
     public double getSamplerTurnDegrees(int timeout) {
         switch (sampler.getPosition(timeout)) {
             case LEFT:
-                return -30.0;
-            case RIGHT:
                 return 30.0;
+            case RIGHT:
+                return -30.0;
             case CENTER:
                 return 0.0;
             default:

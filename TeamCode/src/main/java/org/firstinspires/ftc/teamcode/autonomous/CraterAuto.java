@@ -37,14 +37,14 @@ import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
-@Autonomous(name="BlueCraterAuto", group = "Autonomous")
-public class BlueCraterAuto extends LinearOpMode {
+@Autonomous(name="Crater Auto", group = "Autonomous")
+public class CraterAuto extends LinearOpMode {
     private Robot robot = new Robot();
     private double samplerTurnDegrees = 0;
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
-        robot.init(hardwareMap, this, true, false);
+        robot.init(hardwareMap, this, true, true);
         while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
             telemetry.addData("Status", "waiting for calibration");
             telemetry.update();
@@ -54,36 +54,53 @@ public class BlueCraterAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
+        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
         robot.deploy();
-        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(6000);
+        robot.rotate(-(samplerTurnDegrees + 90.0), .5, 3000);
         if (samplerTurnDegrees != 0) {
-            robot.rotate(samplerTurnDegrees, .5, 3000);
-            sleep(750);
-            robot.moveTicks(2250, .9, 7000);
-            sleep(750);
-            robot.rotate(-2.0 * samplerTurnDegrees, .5, 3000);
-            sleep(750);
-            robot.moveTicks(1250, .9, 5000);
+            sleep(250);
+            robot.moveTicks(-850, .5, 3000);
+            sleep(250);
+            robot.moveTicks(400, .5, 5000);
+            if (samplerTurnDegrees == 30) {
+                robot.rotate(-60.0, .5, 3000);
+                sleep(200);
+                robot.moveTicks(2000, .5, 5000);
+            } else {
+                robot.rotate(-120.0, .5, 3000);
+                sleep(200);
+                robot.moveTicks(2400, .5, 5000);
+            }
+            sleep(200);
+            robot.rotate(-48, .5, 3000);
+            robot.strafeTicks(600, .5, 3000);
+            robot.strafeTicks(-200, .5, 3000);
+            sleep(200);
+            robot.moveTicks(1450, .5, 5000);
+            sleep(200);
+            robot.dropTeamMarker();
+            sleep(200);
+            robot.moveTicks(-2650, .6, 5000);
         } else {
-            sleep(600);
+            sleep(250);
             robot.moveTicks(-650, .5, 5000);
             robot.moveTicks(400, .5, 5000);
-            sleep(600);
+            sleep(250);
             robot.rotate(90, .5, 3000);
+            sleep(200);
+            robot.moveTicks(2200, .5, 5000);
+            sleep(200);
+            robot.rotate(-48, .5, 3000);
+            robot.strafeTicks(600, .5, 3000);
+            robot.strafeTicks(-200, .5, 3000);
+            sleep(200);
+            robot.moveTicks(1450, .5, 5000);
+            sleep(200);
+            robot.dropTeamMarker();
+            sleep(200);
+            robot.moveTicks(-2650, .6, 5000);
         }
-        sleep(200);
-        robot.moveTicks(2200, .5, 5000);
-        sleep(200);
-        robot.rotate(-50, .5, 3000);
-        robot.strafeTicks(400, .5, 3000);
-        sleep(200);
-        robot.moveTicks(1450, .5, 5000);
-        sleep(200);
-        robot.markerServo(RobotConstants.MARKERSERVO_DROP);
-        sleep(200);
-        robot.markerServo(RobotConstants.MARKERSERVO_RETRACTED);
-        sleep(200);
-        robot.moveTicks(-2450, .6, 5000);
+
         robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
         sleep(2000);
     }
