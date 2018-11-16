@@ -55,7 +55,7 @@ public class BlueDepotAuto extends LinearOpMode {
         telemetry.update();
         waitForStart();
         robot.deploy();
-        samplerTurnDegrees = 0/*robot.getSamplerTurnDegrees(6000)*/;
+        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(6000);
         if (samplerTurnDegrees != 0) {
             robot.rotate(samplerTurnDegrees, .5, 3000);
             sleep(750);
@@ -66,19 +66,27 @@ public class BlueDepotAuto extends LinearOpMode {
             robot.moveTicks(1250, .9, 5000);
         } else {
             sleep(600);
-            robot.moveTicks(-1450, .5, 7000);
+            robot.moveTicks(-1600, .5, 5000);
             sleep(600);
-            robot.rotate(60.5, .5, 3000);
+            robot.rotate(80.5, .5, 3000);
         }
-        sleep(600);
+        sleep(200);
+        robot.strafeTicks(300, .5, 1000);
+        sleep(200);
         robot.markerServo(RobotConstants.MARKERSERVO_DROP);
-        sleep(500);
+        sleep(200);
+        robot.markerServo(RobotConstants.MARKERSERVO_RETRACTED);
+        robot.strafeTicks(-300, .5, 1000);
+        sleep(200);
         if (samplerTurnDegrees != 0) {
             robot.rotate(FtcUtils.sign(samplerTurnDegrees) * samplerTurnDegrees + 15.0, .5, 3000);
         } else {
-            robot.rotate(80.5, .5, 3000);
+            robot.rotate(60, .5, 3000);
         }
-        robot.moveTicks(-2380, .6, 5000);
+        robot.moveTicks(-300, .6, 5000);
+        robot.strafeTicks(1300, .5, 3000);
+        robot.moveTicks(-2300, .6, 5000);
         robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
+        sleep(2000);
     }
 }

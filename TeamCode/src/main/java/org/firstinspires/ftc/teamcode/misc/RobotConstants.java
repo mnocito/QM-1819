@@ -7,14 +7,15 @@ public class RobotConstants {
     public static double NOMSERVO_NEUTRAL = .46;
     public static double MARKERSERVO_DROP = .7;
     public static double MARKERSERVO_HOLD = .22;
+    public static double MARKERSERVO_RETRACTED = .17;
     public static double LOWEST_MOTOR_POWER = .2;
     public static double LOWEST_STRAFE_POWER = .4;
     public static double LOWEST_TURN_POWER = .2;
     public static double threshold = .5;
     public static double sensitivity = .9;
     public static double CATAPULT_MOTOR_POWER = .6;
-    public static int MAX_EXTEND_TICKS = 7700;
-    public static int MAX_HANG_TICKS = 14500;
+    public static int MAX_EXTEND_TICKS = 8200;
+    public static int MAX_HANG_TICKS = 14800;
     public enum Position {
         LEFT, RIGHT, CENTER
     }

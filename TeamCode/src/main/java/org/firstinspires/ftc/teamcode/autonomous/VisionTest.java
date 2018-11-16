@@ -32,23 +32,23 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.chassis.Robot;
-import org.firstinspires.ftc.teamcode.misc.FtcUtils;
-import org.firstinspires.ftc.teamcode.misc.RobotConstants;
+import org.firstinspires.ftc.teamcode.chassis.Sampler;
 
 
 @Autonomous(name="Vision Test", group = "Autonomous")
 public class VisionTest extends LinearOpMode {
-    private Robot robot = new Robot();
-    private double samplerTurnDegrees = 0;
+    private Sampler sampler = new Sampler();
+    private boolean canSample = false;
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for vision to init");
         telemetry.update();
-        robot.init(hardwareMap, this, false, true);
-        telemetry.addData("Status", "Initialized");
+        canSample = sampler.init(hardwareMap, this);
+        telemetry.addData("Status", "initted");
         telemetry.update();
         waitForStart();
-        samplerTurnDegrees = robot.getSamplerTurnDegrees(20000);
+        telemetry.addData("has webcam", canSample);
+        sampler.getPosition(Integer.MAX_VALUE);
+        telemetry.update();
         while (opModeIsActive()) idle();
     }
 }

@@ -29,38 +29,62 @@
 
 package org.firstinspires.ftc.teamcode.autonomous;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.chassis.Robot;
+import org.firstinspires.ftc.teamcode.misc.FtcUtils;
+import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
-@Autonomous(name="Gyro Auto Test", group = "Autonomous")
-@Disabled
-public class GyroAutoTest extends LinearOpMode {
+@Autonomous(name="BlueCraterAuto", group = "Autonomous")
+public class BlueCraterAuto extends LinearOpMode {
     private Robot robot = new Robot();
+    private double samplerTurnDegrees = 0;
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
-        robot.init(hardwareMap, this, true);
+        robot.init(hardwareMap, this, true, false);
         while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
             telemetry.addData("Status", "waiting for calibration");
             telemetry.update();
             idle();
         }
+        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        //robot.rotate(120, .5, 4000);
-        robot.rotate(-90, .4, 3500);
-        sleep(1000);
-        robot.rotate(90, .4, 3500);
-        sleep(1000);
-        robot.rotate(-90, .4, 3500);
-        sleep(1000);
-        robot.rotate(90, .4, 3500);
-        sleep(1000);
+        robot.deploy();
+        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(6000);
+        if (samplerTurnDegrees != 0) {
+            robot.rotate(samplerTurnDegrees, .5, 3000);
+            sleep(750);
+            robot.moveTicks(2250, .9, 7000);
+            sleep(750);
+            robot.rotate(-2.0 * samplerTurnDegrees, .5, 3000);
+            sleep(750);
+            robot.moveTicks(1250, .9, 5000);
+        } else {
+            sleep(600);
+            robot.moveTicks(-650, .5, 5000);
+            robot.moveTicks(400, .5, 5000);
+            sleep(600);
+            robot.rotate(90, .5, 3000);
+        }
+        sleep(200);
+        robot.moveTicks(2200, .5, 5000);
+        sleep(200);
+        robot.rotate(-50, .5, 3000);
+        robot.strafeTicks(400, .5, 3000);
+        sleep(200);
+        robot.moveTicks(1450, .5, 5000);
+        sleep(200);
+        robot.markerServo(RobotConstants.MARKERSERVO_DROP);
+        sleep(200);
+        robot.markerServo(RobotConstants.MARKERSERVO_RETRACTED);
+        sleep(200);
+        robot.moveTicks(-2450, .6, 5000);
+        robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
+        sleep(2000);
     }
 }

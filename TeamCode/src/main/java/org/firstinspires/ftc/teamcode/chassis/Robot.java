@@ -24,6 +24,7 @@ public class Robot {
     private int encoderPos = 0;
     private int hangEncoderPos = 0;
     private int extendEncoderPos = 0;
+    public boolean canSample = false;
     private DcMotor FR = null;
     private DcMotor FL = null;
     private DcMotor BR = null;
@@ -71,7 +72,7 @@ public class Robot {
             imu.resetAngle();
         }
         if (initVision) {
-            sampler.init(hwMap, this.context);
+            canSample = sampler.init(hwMap, this.context);
         }
     }
     public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors) {
@@ -193,7 +194,7 @@ public class Robot {
             context.sleep(500);
             strafeTicks(400, .6, 2000);
             context.sleep(500);
-            moveTicks(150, .35, 2000);
+            moveTicks(100, .35, 2000);
             context.sleep(500);
             rotate(-90, .6, 4000);
             break;
@@ -214,11 +215,11 @@ public class Robot {
     public boolean canExtend() {
         return canExtendUp() || canExtendDown();
     }
-    public boolean canHangUp() {
-        return getHangTicks() <= RobotConstants.MAX_HANG_TICKS;
-    }
     public boolean canHangDown() {
-        return getHangTicks() >= 0;
+        return getHangTicks() > -RobotConstants.MAX_HANG_TICKS;
+    }
+    public boolean canHangUp() {
+        return getHangTicks() < 0;
     }
     private void runEncoderMotor(DcMotor motor, int ticks, double pow, int timeout) {
         int encoderPos = motor.getCurrentPosition();

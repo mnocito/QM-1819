@@ -27,16 +27,22 @@ public class Sampler {
     private static final String VUFORIA_KEY = "AUbqP2X/////AAABmanjyi8qNEe4lL7GfntMCVJ562TM830n+NlX1vnENsuMEzeIsEDF/qyeNwM4x+DziWQsfsvpp0SxW5eKQPYRjN7Ie5rdVCCE//IJGv15r5yrTflq/EBo8JRb6VT97RINry7r0rXsCsm6OaB4CgiboJMt0sWuPLL4mCEgREvCSAOjaHcu5vIklq1fS4i8F89EyPm6J/ctw1ePPGUaZyT7vqnGb1P3gF+oELUbkXG/ui3PAeuOXuhbe2eJ0CATQWjV5P4C4v1cL4nhcYjA0Npe/KLQplbQSr4iD141V7dX8rWNYltQj3oSg2TyrMR6bOse6H+06lRfCB/s83pd19/U4gur0LYYJI5lHHVRQh9/n87d";
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
-    public void init(HardwareMap hwMap, LinearOpMode context) {
+    public boolean init(HardwareMap hwMap, LinearOpMode context) {
         this.hwMap = hwMap;
         this.context = context;
-        initVuforia();
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        } else {
-            context.telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-            context.telemetry.update();
+        if (hasWebcam()) { // init vuforia in hasWebcam test, so if successful, we are initted
+            if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+                initTfod();
+                return true;
+            } else {
+                context.telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+                context.telemetry.update();
+            }
         }
+        return false;
+    }
+    public void setHwMap(HardwareMap hwMap) {
+        this.hwMap = hwMap;
     }
     private void initVuforia() {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -49,6 +55,14 @@ public class Sampler {
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+    }
+    public boolean hasWebcam() {
+        try {
+            initVuforia();
+            return true;
+        } catch (Exception f) {
+            return false;
+        }
     }
     public RobotConstants.Position getPosition(int timeout) {
         long startTime = System.currentTimeMillis();
