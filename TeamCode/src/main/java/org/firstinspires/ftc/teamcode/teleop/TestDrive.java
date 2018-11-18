@@ -83,9 +83,9 @@ public class TestDrive extends LinearOpMode {
                     robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
                 }
             }
-            if (robot.canHangUp() && gamepad2.dpad_up) {
+            if (/*robot.canHangUp() &&*/ gamepad2.dpad_up) {
                 robot.hang(1);
-            } else if (robot.canHangDown() && gamepad2.dpad_down) {
+            } else if (/*robot.canHangDown() &&*/ gamepad2.dpad_down) {
                 robot.hang(-1);
             } else {
                 robot.hang(0);

@@ -201,7 +201,7 @@ public class Robot {
     public void dropTeamMarker() {
         while (context.opModeIsActive()) {
             markerServo(RobotConstants.MARKERSERVO_DROP);
-            context.sleep(200);
+            context.sleep(600);
             markerServo(RobotConstants.MARKERSERVO_RETRACTED);
             break;
         }
@@ -248,9 +248,9 @@ public class Robot {
     public double getSamplerTurnDegrees(int timeout) {
         switch (sampler.getPosition(timeout)) {
             case LEFT:
-                return 30.0;
+                return 35.0;
             case RIGHT:
-                return -30.0;
+                return -35.0;
             case CENTER:
                 return 0.0;
             default:

@@ -54,7 +54,7 @@ public class DepotAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
+        if (/*robot.canSample*/ false) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
         robot.deploy();
         robot.rotate(-(samplerTurnDegrees + 90.0), .5, 3000);
         if (samplerTurnDegrees != 0) {
@@ -70,7 +70,7 @@ public class DepotAuto extends LinearOpMode {
                 robot.rotate(90, .5, 3000);
                 robot.moveTicks(-300, .6, 5000);
                 robot.strafeTicks(1300, .5, 3000);
-                robot.strafeTicks(-200, .5, 3000);
+                robot.strafeTicks(-300, .5, 3000);
                 robot.moveTicks(-2300, .6, 5000);
             } else {
                 robot.moveTicks(-1100, .5, 5000);
@@ -81,7 +81,7 @@ public class DepotAuto extends LinearOpMode {
                 robot.moveTicks(-100, .6, 5000);
                 robot.strafeTicks(1300, .5, 3000);
                 robot.strafeTicks(-200, .5, 3000);
-                robot.moveTicks(-2300, .6, 5000);
+                robot.moveTicks(-2600, .6, 5000);
             }
         } else {
             sleep(600);
@@ -98,8 +98,11 @@ public class DepotAuto extends LinearOpMode {
             robot.rotate(60, .5, 3000);
             robot.moveTicks(-300, .6, 5000);
             robot.strafeTicks(1200, .5, 3000);
-            robot.strafeTicks(-200, .5, 3000);
-            robot.moveTicks(-2300, .6, 5000);
+            robot.strafeTicks(-300, .5, 3000);
+            robot.moveTicks(-1500, .6, 5000);
+            robot.strafeTicks(800, .5, 3000);
+            robot.strafeTicks(-300, .5, 3000);
+            robot.moveTicks(-1100, .6, 5000);
         }
         sleep(200);
         robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);

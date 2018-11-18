@@ -45,6 +45,6 @@ public class HangResetAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.hangTicks(14500, -1, 10000);
+        robot.hangTicks(RobotConstants.MAX_HANG_TICKS, -1, 10000);
     }
 }
