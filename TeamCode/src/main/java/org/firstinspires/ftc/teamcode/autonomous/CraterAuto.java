@@ -106,7 +106,6 @@ public class CraterAuto extends LinearOpMode {
             robot.strafeTicks(-300, .5, 3000);
             robot.moveTicks(-2900, .6, 5000);
         }
-
         robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
         sleep(2000);
     }

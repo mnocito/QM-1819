@@ -56,7 +56,7 @@ public class Sampler {
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }
-    public boolean hasWebcam() {
+    private boolean hasWebcam() {
         try {
             initVuforia();
             return true;
@@ -98,16 +98,19 @@ public class Sampler {
                                 if (tfod != null) tfod.shutdown();
                                 context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
                                 context.telemetry.update();
+                                tfod.shutdown();
                                 return RobotConstants.Position.LEFT;
                             } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
                                 if (tfod != null) tfod.shutdown();
                                 context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.RIGHT);
                                 context.telemetry.update();
+                                tfod.shutdown();
                                 return RobotConstants.Position.RIGHT;
                             } else {
                                 if (tfod != null) tfod.shutdown();
                                 context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
                                 context.telemetry.update();
+                                tfod.shutdown();
                                 return RobotConstants.Position.CENTER;
                             }
                         }
@@ -137,20 +140,24 @@ public class Sampler {
                                 if (goldMineralX < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
                                     context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
                                     context.telemetry.update();
+                                    tfod.shutdown();
                                     return RobotConstants.Position.LEFT;
                                 } else {
                                     context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
                                     context.telemetry.update();
+                                    tfod.shutdown();
                                     return RobotConstants.Position.CENTER;
                                 }
                             } else {
                                 if (silverMineral1X < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
                                     context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
                                     context.telemetry.update();
+                                    tfod.shutdown();
                                     return RobotConstants.Position.CENTER;
                                 } else {
                                     context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
                                     context.telemetry.update();
+                                    tfod.shutdown();
                                     return RobotConstants.Position.LEFT;
                                 }
                             }
@@ -167,15 +174,18 @@ public class Sampler {
                                 if (silverMineral2X > RobotConstants.RIGHT_MAX_PIXEL_VALUE) {
                                     context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
                                     context.telemetry.update();
+                                    tfod.shutdown();
                                     return RobotConstants.Position.CENTER;
                                 } else {
                                     context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.RIGHT);
                                     context.telemetry.update();
+                                    tfod.shutdown();
                                     return RobotConstants.Position.RIGHT;
                                 }
                             } else {
                                 context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
                                 context.telemetry.update();
+                                tfod.shutdown();
                                 return RobotConstants.Position.LEFT;
                             }
                         }
