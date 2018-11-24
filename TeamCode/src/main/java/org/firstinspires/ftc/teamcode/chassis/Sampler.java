@@ -319,4 +319,36 @@ public class Sampler {
         }
     //    return RobotConstants.Position.CENTER;
     }
+    public RobotConstants.Position getPositionAlt(int timeout) {
+        long startTime = System.currentTimeMillis();
+        long currentTime = startTime;
+        if (tfod != null) {
+            tfod.activate();
+        } else {
+            context.telemetry.addData("status", "tensorflow not enabled");
+            context.telemetry.update();
+            return RobotConstants.Position.CENTER;
+        }
+        while (context.opModeIsActive() && currentTime - startTime < timeout) {
+            if (tfod != null) {
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                if (updatedRecognitions != null) {
+                    for (Recognition r : updatedRecognitions) {
+                        if (r.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                            if (r.getLeft() > RobotConstants.LEFT_MAX_PIXEL_VALUE_NEW && r.getLeft() < RobotConstants.RIGHT_MAX_PIXEL_VALUE_NEW) {
+                                return RobotConstants.Position.CENTER;
+                            } else if (r.getLeft() <= RobotConstants.LEFT_MAX_PIXEL_VALUE_NEW) {
+                                return RobotConstants.Position.LEFT;
+                            } else if (r.getLeft() >= RobotConstants.RIGHT_MAX_PIXEL_VALUE_NEW) {
+                                return RobotConstants.Position.RIGHT;
+                            }
+                        }
+
+                    }
+                }
+            }
+            currentTime = System.currentTimeMillis();
+        }
+        return RobotConstants.Position.CENTER;
+    }
 }

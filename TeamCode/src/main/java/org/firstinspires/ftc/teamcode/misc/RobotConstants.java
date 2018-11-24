@@ -18,6 +18,8 @@ public class RobotConstants {
     public static int MAX_HANG_TICKS = 15000;
     public static int LEFT_MAX_PIXEL_VALUE = 500;
     public static int RIGHT_MAX_PIXEL_VALUE = 150;
+    public static int LEFT_MAX_PIXEL_VALUE_NEW = 200;
+    public static int RIGHT_MAX_PIXEL_VALUE_NEW = 400;
     public enum Position {
         LEFT, RIGHT, CENTER
     }
