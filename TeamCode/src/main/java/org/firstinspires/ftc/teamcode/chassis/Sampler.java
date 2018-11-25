@@ -98,19 +98,16 @@ public class Sampler {
                                 if (tfod != null) tfod.shutdown();
                                 context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
                                 context.telemetry.update();
-                                tfod.shutdown();
                                 return RobotConstants.Position.LEFT;
                             } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
                                 if (tfod != null) tfod.shutdown();
                                 context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.RIGHT);
                                 context.telemetry.update();
-                                tfod.shutdown();
                                 return RobotConstants.Position.RIGHT;
                             } else {
                                 if (tfod != null) tfod.shutdown();
                                 context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
                                 context.telemetry.update();
-                                tfod.shutdown();
                                 return RobotConstants.Position.CENTER;
                             }
                         }
@@ -133,8 +130,11 @@ public class Sampler {
                         context.telemetry.addData("silver 1", silver1X);
                         context.telemetry.addData("silver 2", silver2X);
                         context.telemetry.update();
-                        if ((silver1X != -1 && silver2X != -1)) return RobotConstants.Position.RIGHT;
-                        else if ((goldX != -1 && silver1X != -1)) {
+                        if ((silver1X != -1 && silver2X != -1)) {
+                            tfod.shutdown();
+                            return RobotConstants.Position.RIGHT;
+                        } else if ((goldX != -1 && silver1X != -1)) {
+                            tfod.shutdown();
                             if (goldX > silver1X) return RobotConstants.Position.CENTER;
                             else return RobotConstants.Position.LEFT;
                         }
@@ -158,7 +158,6 @@ public class Sampler {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                 if (updatedRecognitions != null) {
                     context.telemetry.addData("# Object Detected", updatedRecognitions.size());
-                    context.telemetry.update();
                     if (updatedRecognitions.size() == 3) {
                         int goldMineralX = -1;
                         int silverMineral1X = -1;
@@ -195,7 +194,6 @@ public class Sampler {
                         }
                     } else if (updatedRecognitions.size() == 2) {
                         context.telemetry.addData("using two minerals", "");
-                        context.telemetry.update();
                         int goldX = -1;
                         int silver1X = -1;
                         int silver2X = -1;
