@@ -27,7 +27,7 @@ public class TestDrive extends LinearOpMode {
         telemetry.update();
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
-            if (robot.nomServoPos() == 0) robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
+            telemetry.addData("servo", robot.nomServoPos());
             lefty = FtcUtils.motorScale(gamepad1.left_stick_y) * RobotConstants.sensitivity;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
             leftx = FtcUtils.motorScale(gamepad1.left_stick_x) * RobotConstants.sensitivity;
@@ -62,19 +62,13 @@ public class TestDrive extends LinearOpMode {
                 robot.extend(0);
             }
             if (gamepad2.y) {
-                if (robot.nomServoPos() != RobotConstants.NOMSERVO_UP) {
-                    robot.nomServo(RobotConstants.NOMSERVO_UP);
-                }
+                robot.nomServo(RobotConstants.NOMSERVO_UP);
             }
             if (gamepad2.a) {
-                if (robot.nomServoPos() != RobotConstants.NOMSERVO_DOWN) {
-                    robot.nomServo(RobotConstants.NOMSERVO_DOWN);
-                }
+                robot.nomServo(RobotConstants.NOMSERVO_DOWN);
             }
             if (gamepad2.x) {
-                if (robot.nomServoPos() != RobotConstants.NOMSERVO_NEUTRAL) {
-                    robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
-                }
+                robot.nomServo(.35);
             }
             if (/*robot.canHangUp() &&*/ gamepad2.dpad_up) {
                 robot.hang(1);

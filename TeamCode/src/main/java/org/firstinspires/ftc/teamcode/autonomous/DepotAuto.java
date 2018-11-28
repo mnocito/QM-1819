@@ -68,20 +68,12 @@ public class DepotAuto extends LinearOpMode {
                 robot.moveTicks(-1250, .5, 5000);
                 robot.dropTeamMarker();
                 robot.rotate(90, .5, 3000);
-                robot.moveTicks(-300, .6, 5000);
-                robot.strafeTicks(1300, .5, 3000);
-                robot.strafeTicks(-300, .5, 3000);
-                robot.moveTicks(-2300, .6, 5000);
             } else {
                 robot.moveTicks(-1100, .5, 5000);
                 robot.rotate(90, .5, 3000);
                 robot.dropTeamMarker();
                 robot.strafeTicks(-200, .5, 3000);
                 robot.rotate(75, .5, 3000);
-                robot.moveTicks(-100, .6, 5000);
-                robot.strafeTicks(1300, .5, 3000);
-                robot.strafeTicks(-200, .5, 3000);
-                robot.moveTicks(-2600, .6, 5000);
             }
         } else {
             sleep(600);
@@ -96,14 +88,8 @@ public class DepotAuto extends LinearOpMode {
             robot.markerServo(RobotConstants.MARKERSERVO_RETRACTED);
             robot.strafeTicks(-300, .5, 1000);
             robot.rotate(60, .5, 3000);
-            robot.moveTicks(-300, .6, 5000);
-            robot.strafeTicks(1200, .5, 3000);
-            robot.strafeTicks(-300, .5, 3000);
-            robot.moveTicks(-1500, .6, 5000);
-            robot.strafeTicks(800, .5, 3000);
-            robot.strafeTicks(-300, .5, 3000);
-            robot.moveTicks(-1100, .6, 5000);
         }
+        robot.moveToCrater();
         sleep(200);
         robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
         sleep(2000);

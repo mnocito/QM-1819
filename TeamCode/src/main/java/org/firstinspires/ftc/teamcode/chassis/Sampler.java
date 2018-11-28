@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.chassis;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.vuforia.CameraDevice;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -49,6 +50,7 @@ public class Sampler {
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraName = hwMap.get(WebcamName.class, "webcam");
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
     }
     private void initTfod() {
         int tfodMonitorViewId = hwMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hwMap.appContext.getPackageName());
@@ -61,6 +63,8 @@ public class Sampler {
             initVuforia();
             return true;
         } catch (Exception f) {
+            context.telemetry.addData("we broke", "lol");
+            context.telemetry.update();
             return false;
         }
     }
@@ -79,7 +83,7 @@ public class Sampler {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                 if (updatedRecognitions != null) {
                     context.telemetry.addData("# Object Detected", updatedRecognitions.size());
-                    context.telemetry.update();
+
                     if (updatedRecognitions.size() == 3) {
                         int goldMineralX = -1;
                         int silverMineral1X = -1;
@@ -158,6 +162,17 @@ public class Sampler {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                 if (updatedRecognitions != null) {
                     context.telemetry.addData("# Object Detected", updatedRecognitions.size());
+                    for (Recognition recognition : updatedRecognitions) {
+                        if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                            context.telemetry.addData("gold bottom", recognition.getBottom());
+                            context.telemetry.addData("gold top", recognition.getTop());
+                        } else {
+                            context.telemetry.addData("silver bottom", recognition.getBottom());
+                            context.telemetry.addData("silver top", recognition.getTop());
+                        }
+                    }
+                    context.telemetry.update();
+                    context.sleep(7000);
                     if (updatedRecognitions.size() == 3) {
                         int goldMineralX = -1;
                         int silverMineral1X = -1;
