@@ -30,28 +30,56 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.chassis.Robot;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
-@Autonomous(name="Team Marker Servo Test", group = "Autonomous")
-public class TeamMarkerServoTest extends LinearOpMode {
+@Autonomous(name="Sample Depot", group = "Autonomous")
+public class SampleDepotTest extends LinearOpMode {
     private Robot robot = new Robot();
+    private double samplerTurnDegrees = 0;
     public void runOpMode() throws InterruptedException {
+        telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
-        robot.init(hardwareMap, this, false);
+        robot.init(hardwareMap, this, true, true);
+        while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
+            telemetry.addData("Status", "waiting for calibration");
+            telemetry.update();
+            idle();
+        }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        telemetry.addData("Status", "");
-        telemetry.update();
-        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
-        sleep(2000);
-        robot.markerServo(RobotConstants.MARKERSERVO_DROP);
-        sleep(2000);
-
+        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
+        robot.rotate(-(samplerTurnDegrees + 90.0), .5, 3000);
+        if (samplerTurnDegrees != 0) {
+            sleep(250);
+            robot.moveTicks(-1400, .5, 4000);
+            robot.moveTicks(150, .5, 4000);
+            sleep(250);
+            if (samplerTurnDegrees > 0) {
+                robot.rotate(2.0 * samplerTurnDegrees - 10.0, .5, 3000);
+                robot.moveTicks(-1150, .5, 5000);
+                robot.dropTeamMarker();
+                robot.rotate(110, .5, 3000);
+            } else {
+                robot.rotate(2.0 * samplerTurnDegrees, .5, 3000);
+                robot.moveTicks(-1100, .5, 5000);
+                robot.rotate(70, .5, 3000);
+                robot.dropTeamMarker();
+                robot.strafeTicks(-200, .5, 3000);
+                robot.rotate(95, .5, 3000);
+            }
+        } else {
+            sleep(600);
+            robot.moveTicks(-1600, .5, 5000);
+            sleep(600);
+            robot.rotate(80.5, .5, 3000);
+            sleep(200);
+            robot.strafeTicks(300, .5, 1000);
+            robot.dropTeamMarker();
+        }
     }
 }

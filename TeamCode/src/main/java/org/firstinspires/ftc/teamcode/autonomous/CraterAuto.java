@@ -54,7 +54,8 @@ public class CraterAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        if (/*robot.canSample*/false) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
+        robot.hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
+        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
         robot.deploy();
         robot.rotate(-(samplerTurnDegrees + 90.0), .5, 3000);
         telemetry.addData("sample", robot.canSample);
@@ -63,7 +64,7 @@ public class CraterAuto extends LinearOpMode {
             robot.moveTicks(-850, .5, 3000);
             sleep(200);
             robot.moveTicks(400, .5, 5000);
-            if (samplerTurnDegrees == 30) {
+            if (samplerTurnDegrees > 0) {
                 robot.rotate(-70.0, .5, 3000);
                 sleep(200);
                 robot.strafeTicks(-200, .6, 2000);

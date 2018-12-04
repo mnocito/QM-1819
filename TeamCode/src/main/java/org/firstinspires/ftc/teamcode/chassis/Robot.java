@@ -49,9 +49,7 @@ public class Robot {
         hang = hwMap.get(DcMotor.class, "hang");
         BR = hwMap.get(DcMotor.class, "BR");
         BL = hwMap.get(DcMotor.class, "BL");
-        nomServo1 = hwMap.get(Servo.class, "nomServo1");
-        nomServo2 = hwMap.get(Servo.class, "nomServo2");
-        nomServo1.setDirection(Servo.Direction.REVERSE);
+       // nomServo1 = hwMap.get(Servo.class, "nomServo1");
         markerServo = hwMap.get(Servo.class, "markerServo");
         catapult = hwMap.get(DcMotor.class, "catapult");
         catapult.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -62,7 +60,7 @@ public class Robot {
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         nom.setDirection(DcMotorSimple.Direction.FORWARD);
         hang.setDirection(DcMotorSimple.Direction.REVERSE);
-        extend.setDirection(DcMotorSimple.Direction.REVERSE);
+        extend.setDirection(DcMotorSimple.Direction.FORWARD);
         catapult.setDirection(DcMotorSimple.Direction.FORWARD);
         FL.setDirection(DcMotorSimple.Direction.FORWARD);
         BL.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -173,7 +171,6 @@ public class Robot {
         context.telemetry.update();
     }
     public void deploy() {
-        hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
         drive(.5, -.5, .5, -.5, 300);
         context.sleep(250);
         moveTicks(-100, .35, 2000);
@@ -195,7 +192,7 @@ public class Robot {
     public void dropTeamMarker() {
         markerServo(RobotConstants.MARKERSERVO_DROP);
         context.sleep(600);
-        markerServo(RobotConstants.MARKERSERVO_RETRACTED);
+        markerServo(RobotConstants.MARKERSERVO_HOLD);
     }
     public void hangTicks(int ticks, double pow, int timeout) {
         runEncoderMotor(hang, ticks, pow, timeout);
@@ -238,9 +235,9 @@ public class Robot {
     public double getSamplerTurnDegrees(int timeout) {
         switch (sampler.getPosition(timeout)) {
             case LEFT:
-                return 35.0;
+                return 30.0;
             case RIGHT:
-                return -35.0;
+                return -30.0;
             case CENTER:
                 return 0.0;
             default:
@@ -274,13 +271,22 @@ public class Robot {
         extend.setPower(power);
     }
     public void nomServo(double pos) {
-        nomServo1.setPosition(pos);
+        if (nomServo2 == null) {
+            nomServo2 = hwMap.get(Servo.class, "nomServo2");
+            nomServo2.setDirection(Servo.Direction.REVERSE);
+        }
         nomServo2.setPosition(pos);
     }
     public void markerServo(double pos) {
         markerServo.setPosition(pos);
     }
-    public double nomServoPos() { return nomServo1.getPosition(); }
+    public double nomServoPos() {
+        if (nomServo2 == null ) {
+            nomServo2 = hwMap.get(Servo.class, "nomServo2");
+            nomServo2.setDirection(Servo.Direction.REVERSE);
+        }
+        return nomServo2.getPosition();
+    }
     public double sensorOneDist() {
         return sensor1.getDistance(DistanceUnit.INCH);
     }

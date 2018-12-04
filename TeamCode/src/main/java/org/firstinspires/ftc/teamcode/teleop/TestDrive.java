@@ -22,12 +22,14 @@ public class TestDrive extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap, this, false);
-        robot.markerServo(RobotConstants.MARKERSERVO_RETRACTED);
+        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
         telemetry.addData("Status", "Initialization bas been completed");
         telemetry.update();
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
             telemetry.addData("servo", robot.nomServoPos());
+            telemetry.addData("extend", robot.getExtendTicks());
+            telemetry.addData("hang", robot.getHangTicks());
             lefty = FtcUtils.motorScale(gamepad1.left_stick_y) * RobotConstants.sensitivity;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
             leftx = FtcUtils.motorScale(gamepad1.left_stick_x) * RobotConstants.sensitivity;
@@ -68,7 +70,7 @@ public class TestDrive extends LinearOpMode {
                 robot.nomServo(RobotConstants.NOMSERVO_DOWN);
             }
             if (gamepad2.x) {
-                robot.nomServo(.35);
+                robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
             }
             if (/*robot.canHangUp() &&*/ gamepad2.dpad_up) {
                 robot.hang(1);

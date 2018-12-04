@@ -50,11 +50,12 @@ public class DepotAuto extends LinearOpMode {
             telemetry.update();
             idle();
         }
-        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        if (/*robot.canSample*/ false) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
+        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
+        robot.hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
+        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
         robot.deploy();
         robot.rotate(-(samplerTurnDegrees + 90.0), .5, 3000);
         if (samplerTurnDegrees != 0) {
@@ -64,7 +65,7 @@ public class DepotAuto extends LinearOpMode {
             sleep(250);
             robot.rotate(2.0 * samplerTurnDegrees + 10.0, .5, 3000);
             sleep(250);
-            if (samplerTurnDegrees == 30) {
+            if (samplerTurnDegrees > 0) {
                 robot.moveTicks(-1250, .5, 5000);
                 robot.dropTeamMarker();
                 robot.rotate(90, .5, 3000);
@@ -82,10 +83,7 @@ public class DepotAuto extends LinearOpMode {
             robot.rotate(80.5, .5, 3000);
             sleep(200);
             robot.strafeTicks(300, .5, 1000);
-            sleep(200);
-            robot.markerServo(RobotConstants.MARKERSERVO_DROP);
-            sleep(200);
-            robot.markerServo(RobotConstants.MARKERSERVO_RETRACTED);
+            robot.dropTeamMarker();
             robot.strafeTicks(-300, .5, 1000);
             robot.rotate(60, .5, 3000);
         }

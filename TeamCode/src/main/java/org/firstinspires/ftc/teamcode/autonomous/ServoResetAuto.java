@@ -30,28 +30,20 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.chassis.Robot;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
-@Autonomous(name="Team Marker Servo Test", group = "Autonomous")
-public class TeamMarkerServoTest extends LinearOpMode {
+@Autonomous(name="Reset Servo", group = "Autonomous")
+public class ServoResetAuto extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
-        telemetry.update();
         robot.init(hardwareMap, this, false);
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status", "initialized");
         telemetry.update();
         waitForStart();
-        telemetry.addData("Status", "");
-        telemetry.update();
-        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
-        sleep(2000);
-        robot.markerServo(RobotConstants.MARKERSERVO_DROP);
-        sleep(2000);
-
+        robot.nomServo(RobotConstants.NOMSERVO_UP);
     }
 }
