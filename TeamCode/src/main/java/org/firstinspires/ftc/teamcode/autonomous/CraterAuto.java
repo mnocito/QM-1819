@@ -40,7 +40,6 @@ import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 @Autonomous(name="Crater Auto", group = "Autonomous")
 public class CraterAuto extends LinearOpMode {
     private Robot robot = new Robot();
-    private double samplerTurnDegrees = 0;
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
@@ -54,17 +53,15 @@ public class CraterAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
-        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
         robot.deploy();
-        robot.rotate(-(samplerTurnDegrees + 90.0), .5, 3000);
+        robot.rotate(-(robot.samplerTurnDegrees + 90.0), .5, 3000);
         telemetry.addData("sample", robot.canSample);
-        if (samplerTurnDegrees != 0) {
+        if (robot.samplerTurnDegrees != 0) {
             sleep(200);
             robot.moveTicks(-850, .5, 3000);
             sleep(200);
             robot.moveTicks(400, .5, 5000);
-            if (samplerTurnDegrees > 0) {
+            if (robot.samplerTurnDegrees > 0) {
                 robot.rotate(-70.0, .5, 3000);
                 sleep(200);
                 robot.strafeTicks(-200, .6, 2000);

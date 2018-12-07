@@ -6,7 +6,7 @@ public class RobotConstants {
     public static double NOMSERVO_DOWN = .08;
     public static double NOMSERVO_NEUTRAL = .4;
     public static double MARKERSERVO_DROP = .7;
-    public static double MARKERSERVO_HOLD = .35;
+    public static double MARKERSERVO_HOLD = .3405;
     public static double LOWEST_MOTOR_POWER = .2;
     public static double LOWEST_STRAFE_POWER = .4;
     public static double LOWEST_TURN_POWER = .24;

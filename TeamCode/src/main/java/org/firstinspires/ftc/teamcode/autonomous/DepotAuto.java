@@ -40,7 +40,6 @@ import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 @Autonomous(name="Depot Auto", group = "Autonomous")
 public class DepotAuto extends LinearOpMode {
     private Robot robot = new Robot();
-    private double samplerTurnDegrees = 0;
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
@@ -54,42 +53,41 @@ public class DepotAuto extends LinearOpMode {
         telemetry.update();
         waitForStart();
         robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
-        robot.hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
-        if (robot.canSample) samplerTurnDegrees = robot.getSamplerTurnDegrees(2500);
         robot.deploy();
-        robot.rotate(-(samplerTurnDegrees + 90.0), .5, 3000);
-        if (samplerTurnDegrees != 0) {
+        robot.rotate(-(robot.samplerTurnDegrees + 90.0), .5, 3000);
+        if (robot.samplerTurnDegrees != 0) {
             sleep(250);
             robot.moveTicks(-1400, .5, 4000);
             robot.moveTicks(150, .5, 4000);
             sleep(250);
-            robot.rotate(2.0 * samplerTurnDegrees + 10.0, .5, 3000);
-            sleep(250);
-            if (samplerTurnDegrees > 0) {
-                robot.moveTicks(-1250, .5, 5000);
+            if (robot.samplerTurnDegrees > 0) {
+                robot.rotate(2.0 * robot.samplerTurnDegrees + 15, .5, 3000);
+                robot.moveTicks(-1150, .5, 5000);
+                robot.rotate(50, .5, 3000);
                 robot.dropTeamMarker();
-                robot.rotate(90, .5, 3000);
+                robot.rotate(50, .5, 3000);
             } else {
-                robot.moveTicks(-1100, .5, 5000);
-                robot.rotate(90, .5, 3000);
+                robot.rotate(2.0 * robot.samplerTurnDegrees + 10, .5, 3000);
+                robot.moveTicks(-1000, .8, 5000);
+                robot.rotate(110, .8, 3000);
+                robot.strafeTicks(200, .7, 3000);
                 robot.dropTeamMarker();
-                robot.strafeTicks(-200, .5, 3000);
-                robot.rotate(75, .5, 3000);
+                robot.strafeTicks(-200, .7, 3000);
+                robot.rotate(40, .8, 3000);
             }
         } else {
             sleep(600);
-            robot.moveTicks(-1600, .5, 5000);
+            robot.moveTicks(-1500, .8, 5000);
             sleep(600);
-            robot.rotate(80.5, .5, 3000);
+            robot.rotate(100.5, .6, 3000);
             sleep(200);
-            robot.strafeTicks(300, .5, 1000);
+            robot.strafeTicks(300, .8, 1000);
             robot.dropTeamMarker();
-            robot.strafeTicks(-300, .5, 1000);
-            robot.rotate(60, .5, 3000);
+            robot.strafeTicks(-150, .8, 1000);
+            robot.rotate(35, .6, 3000);
         }
         robot.moveToCrater();
         sleep(200);
         robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
-        sleep(2000);
     }
 }

@@ -31,6 +31,7 @@ public class Robot {
     private DcMotor nom = null;
     private DcMotor hang = null;
     private DcMotor extend = null;
+    public double samplerTurnDegrees = 0;
     private DcMotor BL = null;
     private Servo nomServo1 = null;
     private Servo markerServo = null;
@@ -171,23 +172,25 @@ public class Robot {
         context.telemetry.update();
     }
     public void deploy() {
+        hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
+        if (canSample) samplerTurnDegrees = getSamplerTurnDegrees(2500);
         drive(.5, -.5, .5, -.5, 300);
-        context.sleep(250);
-        moveTicks(-100, .35, 2000);
-        context.sleep(250);
+        context.sleep(100);
+        moveTicks(-100, .4, 2000);
+        context.sleep(100);
         strafeTicks(400, .6, 2000);
-        context.sleep(250);
-        moveTicks(100, .35, 2000);
-        context.sleep(250);
+        context.sleep(100);
+        moveTicks(100, .4, 2000);
+        context.sleep(100);
     }
     public void moveToCrater() {
-        moveTicks(-300, .6, 5000);
-        strafeTicks(1200, .5, 3000);
-        strafeTicks(-300, .5, 3000);
-        moveTicks(-1500, .6, 5000);
-        strafeTicks(800, .5, 3000);
-        strafeTicks(-130, .5, 3000);
-        moveTicks(-1100, .6, 5000);
+        moveTicks(-300, .8, 5000);
+        strafeTicks(1200, .9, 3000);
+        strafeTicks(-300, .9, 1500);
+        moveTicks(-1500, .8, 5000);
+        strafeTicks(800, .7, 3000);
+        strafeTicks(-130, .7, 3000);
+        moveTicks(-1100, .8, 1500);
     }
     public void dropTeamMarker() {
         markerServo(RobotConstants.MARKERSERVO_DROP);
@@ -237,7 +240,7 @@ public class Robot {
             case LEFT:
                 return 30.0;
             case RIGHT:
-                return -30.0;
+                return -35.0;
             case CENTER:
                 return 0.0;
             default:
