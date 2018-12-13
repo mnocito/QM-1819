@@ -30,41 +30,21 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.misc.FtcUtils;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import org.firstinspires.ftc.teamcode.chassis.IMU;
+import org.firstinspires.ftc.teamcode.chassis.Robot;
 
 
-@Autonomous(name="Gyro Auto Singular Test", group = "Autonomous")
+@Autonomous(name="Align Wall Test", group = "Autonomous")
 @Disabled
-public class GyroAutoSingularTest extends LinearOpMode {
-    private IMU imu = new IMU();
-    double degs = 50; // degrees to turn
+public class AlignWallTest extends LinearOpMode {
+    private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "waiting for imu to init");
-        telemetry.update();
-        imu.init(hardwareMap, "imu");
-        while (!imu.isGyroCalibrated() && opModeIsActive()) {
-            idle();
-        }
-        imu.resetAngle();
-        long startTime = System.currentTimeMillis();
-        telemetry.addData("status", "waiting for start");
-        telemetry.addData("globalAngle", imu.getAngle());
-        telemetry.addData("goal", degs);
-        telemetry.addData("global less than degs", FtcUtils.abs(imu.getAngle()) < FtcUtils.abs(degs));
+        robot.init(hardwareMap, this, false);
+        telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        degs = -degs;
-        while (FtcUtils.abs(imu.getAngle()) < FtcUtils.abs(degs) && opModeIsActive()) {
-            telemetry.addData("cur angle", imu.getAngle());
-            telemetry.addData("angle diff", FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()));
-            telemetry.update();
-            imu.updateAngle();
-        }
-        telemetry.addData("status", "done");
-        telemetry.update();
+        robot.alignWithWall(.5);
     }
 }

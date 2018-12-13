@@ -15,7 +15,9 @@ public class RobotConstants {
     public static double CATAPULT_MOTOR_POWER = .6;
     public static int MAX_EXTEND_TICKS = 8000;
     public static int MAX_HANG_TICKS = 15000;
+    public static int MIN_EXTEND_TICKS = -25;
     public static int LEFT_MAX_PIXEL_VALUE = 200;
+    public static double TURN_TOLERANCE = 1;
     public static int RIGHT_MIN_PIXEL_VALUE= 400;
     public enum Position {
         LEFT, RIGHT, CENTER

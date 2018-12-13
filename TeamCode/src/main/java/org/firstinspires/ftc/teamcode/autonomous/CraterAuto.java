@@ -57,29 +57,23 @@ public class CraterAuto extends LinearOpMode {
         robot.rotate(-(robot.samplerTurnDegrees + 90.0), .5, 3000);
         telemetry.addData("sample", robot.canSample);
         if (robot.samplerTurnDegrees != 0) {
-            sleep(200);
             robot.moveTicks(-850, .5, 3000);
-            sleep(200);
             robot.moveTicks(400, .5, 5000);
             if (robot.samplerTurnDegrees > 0) {
                 robot.rotate(-70.0, .5, 3000);
-                sleep(200);
                 robot.strafeTicks(-200, .6, 2000);
                 robot.moveTicks(-2000, .5, 5000);
             } else {
-                robot.rotate(-130.0, .5, 3000);
-                sleep(200);
-                robot.moveTicks(-2400, .5, 5000);
+                robot.rotate(-115.0, .5, 3000);
+                robot.moveTicks(-2400, .65, 2500);
             }
-            sleep(200);
-            robot.rotate(-40, .5, 3000);
-            robot.strafeTicks(600, .5, 3000);
-            robot.strafeTicks(-320, .5, 3000);
-            sleep(200);
-            robot.moveTicks(1450, .5, 5000);
-            sleep(200);
+            robot.rotate(-45, .5, 3000);
+            robot.strafeTicks(-400, .6, 2000);
+            robot.strafeTicks(250, .6, 3000);
+            robot.moveTicks(-1450, .7, 2000);
+            robot.rotate(90, .7, 2000);
             robot.dropTeamMarker();
-            sleep(200);
+            robot.rotate(90, .7, 2000);
             robot.moveTicks(-2650, .6, 5000);
         } else {
             sleep(200);

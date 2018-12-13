@@ -20,7 +20,8 @@ public class Robot {
     ElapsedTime clock = new ElapsedTime();
     public IMU imu;
     public Sampler sampler;
-    private Rev2mDistanceSensor sensor1;
+    private Rev2mDistanceSensor frontDistanceSensor;
+    private Rev2mDistanceSensor backDistanceSensor;
     private int encoderPos = 0;
     private int hangEncoderPos = 0;
     private int extendEncoderPos = 0;
@@ -50,7 +51,8 @@ public class Robot {
         hang = hwMap.get(DcMotor.class, "hang");
         BR = hwMap.get(DcMotor.class, "BR");
         BL = hwMap.get(DcMotor.class, "BL");
-       // nomServo1 = hwMap.get(Servo.class, "nomServo1");
+        frontDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "front");
+        backDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "back");
         markerServo = hwMap.get(Servo.class, "markerServo");
         catapult = hwMap.get(DcMotor.class, "catapult");
         catapult.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -151,18 +153,46 @@ public class Robot {
         imu.resetAngle();
         long startTime = System.currentTimeMillis();
         long currentTime = startTime;
-        double newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_TURN_POWER, pow);
+        double currentAngle = imu.getAngle();
+        double newPow = pow;
         context.telemetry.addData("status", "waiting for start");
         context.telemetry.addData("newPow", newPow);
-        context.telemetry.addData("globalAngle", imu.getAngle());
-        context.telemetry.addData("global less than degs", FtcUtils.abs(imu.getAngle()) < FtcUtils.abs(degs));
+        context.telemetry.addData("globalAngle", currentAngle);
+        context.telemetry.addData("global less than degs", FtcUtils.abs(currentAngle) < FtcUtils.abs(degs));
         context.telemetry.update();
-        while (FtcUtils.abs(imu.getAngle()) < FtcUtils.abs(degs) && currentTime - startTime < timeout && context.opModeIsActive()) {
+        while (FtcUtils.abs(currentAngle) < FtcUtils.abs(degs) && currentTime - startTime < timeout && context.opModeIsActive()) {
+            currentAngle = imu.getAngle();
             drive(-FtcUtils.sign(degs) * newPow, -FtcUtils.sign(degs) * newPow, FtcUtils.sign(degs) * newPow, FtcUtils.sign(degs) * newPow);
-            newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_TURN_POWER, pow);
+            newPow = FtcUtils.map(FtcUtils.abs(degs) - FtcUtils.abs(currentAngle), 0, FtcUtils.abs(degs), RobotConstants.LOWEST_TURN_POWER, pow);
             context.telemetry.addData("cur pow", newPow);
-            context.telemetry.addData("cur angle", imu.getAngle());
-            context.telemetry.addData("angle diff", FtcUtils.abs(degs) - FtcUtils.abs(imu.getAngle()));
+            context.telemetry.addData("cur angle", currentAngle);
+            context.telemetry.addData("angle diff", FtcUtils.abs(degs) - FtcUtils.abs(currentAngle));
+            context.telemetry.update();
+            currentTime = System.currentTimeMillis();
+            imu.updateAngle();
+        }
+        stop();
+        context.telemetry.addData("status", "done");
+        context.telemetry.update();
+    }
+    public void rotatePID(double degs, double pow, int timeout) {
+        imu.resetAngle();
+        long startTime = System.currentTimeMillis();
+        long currentTime = startTime;
+        double currentAngle = imu.getAngle();
+        double newPow = pow;
+        context.telemetry.addData("status", "waiting for start");
+        context.telemetry.addData("newPow", newPow);
+        context.telemetry.addData("globalAngle", currentAngle);
+        context.telemetry.addData("global less than degs", FtcUtils.abs(currentAngle) < FtcUtils.abs(degs));
+        context.telemetry.update();
+        while (FtcUtils.abs(degs) - FtcUtils.abs(currentAngle) > RobotConstants.TURN_TOLERANCE && currentTime - startTime < timeout && context.opModeIsActive()) {
+            currentAngle = imu.getAngle();
+            drive(-newPow, -newPow, newPow, newPow);
+            context.telemetry.addData("cur pow", newPow);
+            context.telemetry.addData("cur angle", currentAngle);
+            context.telemetry.addData("angle diff", FtcUtils.abs(degs) - FtcUtils.abs(currentAngle));
+            newPow = FtcUtils.sign(degs) * newPow - getKp() * (degs - currentAngle);
             context.telemetry.update();
             currentTime = System.currentTimeMillis();
             imu.updateAngle();
@@ -183,12 +213,31 @@ public class Robot {
         moveTicks(100, .4, 2000);
         context.sleep(100);
     }
+    public void alignWithWall(double pow) {
+        double frontDist = frontDist();
+        double backDist = backDist();
+        double initialDist = Math.abs(frontDist - backDist);
+        double newPow = pow;
+        while (Math.abs(frontDist - backDist) > 1.0 && context.opModeIsActive()) {
+            drive(-FtcUtils.sign(frontDist - backDist) * newPow, -FtcUtils.sign(frontDist - backDist) * newPow, FtcUtils.sign(frontDist - backDist) * newPow, FtcUtils.sign(frontDist - backDist) * newPow);
+            context.telemetry.addData("front", frontDist);
+            context.telemetry.addData("back", backDist);
+            context.telemetry.addData("initial diff", initialDist);
+            context.telemetry.addData("curr diff", frontDist - backDist);
+            context.telemetry.update();
+            newPow = FtcUtils.map(Math.abs(frontDist - backDist), 0, initialDist, RobotConstants.LOWEST_TURN_POWER, pow);
+            frontDist = frontDist();
+            backDist = backDist();
+        }
+        stop();
+    }
+
     public void moveToCrater() {
         moveTicks(-300, .8, 5000);
         strafeTicks(1200, .9, 3000);
-        strafeTicks(-300, .9, 1500);
+        strafeTicks(-300, .7, 1500);
         moveTicks(-1500, .8, 5000);
-        strafeTicks(800, .7, 3000);
+        strafeTicks(1200, .7, 3000);
         strafeTicks(-130, .7, 3000);
         moveTicks(-1100, .8, 1500);
     }
@@ -207,7 +256,7 @@ public class Robot {
         return getExtendTicks() <= RobotConstants.MAX_EXTEND_TICKS && context.gamepad2.left_stick_y < 0;
     }
     public boolean canExtendDown() {
-        return getExtendTicks() >= -50 && context.gamepad2.left_stick_y > 0;
+        return getExtendTicks() >= RobotConstants.MIN_EXTEND_TICKS && context.gamepad2.left_stick_y > 0;
     }
     public boolean canExtend() {
         return canExtendUp() || canExtendDown();
@@ -238,7 +287,7 @@ public class Robot {
     public double getSamplerTurnDegrees(int timeout) {
         switch (sampler.getPosition(timeout)) {
             case LEFT:
-                return 30.0;
+                return 35.0;
             case RIGHT:
                 return -35.0;
             case CENTER:
@@ -290,10 +339,16 @@ public class Robot {
         }
         return nomServo2.getPosition();
     }
-    public double sensorOneDist() {
-        return sensor1.getDistance(DistanceUnit.INCH);
+    public double frontDist() {
+        return frontDistanceSensor.getDistance(DistanceUnit.INCH);
+    }
+    public double backDist() {
+        return backDistanceSensor.getDistance(DistanceUnit.INCH);
     }
     public void stop() {
         drive(0, 0, 0, 0);
+    }
+    double getKp() {
+        return 0.02;
     }
 }

@@ -15,10 +15,7 @@ public class TestDrive extends LinearOpMode {
     private double rightx = 0;
     private double leftx = 0;
     private double lefty = 0;
-    private double frontLeft;
-    private double frontRight;
-    private double backRight;
-    private double backLeft;
+    private boolean pressed = false;
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap, this, false);
@@ -71,6 +68,14 @@ public class TestDrive extends LinearOpMode {
             }
             if (gamepad2.x) {
                 robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
+            }
+            if (gamepad2.right_bumper) {
+                if (!pressed) {
+                    pressed = true;
+                    RobotConstants.MIN_EXTEND_TICKS -= 100;
+                }
+            } else {
+                pressed = false;
             }
             if (/*robot.canHangUp() &&*/ gamepad2.dpad_up) {
                 robot.hang(1);

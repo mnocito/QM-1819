@@ -163,12 +163,51 @@ public class Sampler {
                                 return RobotConstants.Position.CENTER;
                             }
                         } else if ((goldX != -1 && silver1X != -1)) {
-                            if (goldX > silver1X) context.telemetry.addData("position", "center");
-                            else context.telemetry.addData("position", "left");
-                            context.telemetry.update();
-                            tfod.shutdown();
-                            if (goldX > silver1X) return RobotConstants.Position.CENTER;
-                            else return RobotConstants.Position.LEFT;
+                            if (goldX > silver1X) {
+                                if (goldX > RobotConstants.RIGHT_MIN_PIXEL_VALUE || (silver1X > RobotConstants.LEFT_MAX_PIXEL_VALUE && silver1X < RobotConstants.RIGHT_MIN_PIXEL_VALUE)) {
+                                    context.telemetry.addData("position", "right");
+                                    context.telemetry.update();
+                                    tfod.shutdown();
+                                    return RobotConstants.Position.RIGHT;
+                                } else if (silver1X < RobotConstants.LEFT_MAX_PIXEL_VALUE || (goldX > RobotConstants.LEFT_MAX_PIXEL_VALUE && goldX < RobotConstants.RIGHT_MIN_PIXEL_VALUE))  {
+                                    context.telemetry.addData("position", "center");
+                                    context.telemetry.update();
+                                    tfod.shutdown();
+                                    return RobotConstants.Position.CENTER;
+                                } else if (goldX < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
+                                    context.telemetry.addData("position", "left");
+                                    context.telemetry.update();
+                                    tfod.shutdown();
+                                    return RobotConstants.Position.LEFT;
+                                } else {
+                                    context.telemetry.addData("position", "center");
+                                    context.telemetry.update();
+                                    tfod.shutdown();
+                                    return RobotConstants.Position.CENTER;
+                                }
+                            } else {
+                                if (silver1X > RobotConstants.RIGHT_MIN_PIXEL_VALUE || (goldX > RobotConstants.LEFT_MAX_PIXEL_VALUE && goldX < RobotConstants.RIGHT_MIN_PIXEL_VALUE)) {
+                                    context.telemetry.addData("position", "center");
+                                    context.telemetry.update();
+                                    tfod.shutdown();
+                                    return RobotConstants.Position.CENTER;
+                                } else if (goldX < RobotConstants.LEFT_MAX_PIXEL_VALUE || (silver1X > RobotConstants.LEFT_MAX_PIXEL_VALUE && silver1X < RobotConstants.RIGHT_MIN_PIXEL_VALUE))  {
+                                    context.telemetry.addData("position", "left");
+                                    context.telemetry.update();
+                                    tfod.shutdown();
+                                    return RobotConstants.Position.LEFT;
+                                } else if (goldX < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
+                                    context.telemetry.addData("position", "left");
+                                    context.telemetry.update();
+                                    tfod.shutdown();
+                                    return RobotConstants.Position.LEFT;
+                                } else {
+                                    context.telemetry.addData("position", "center");
+                                    context.telemetry.update();
+                                    tfod.shutdown();
+                                    return RobotConstants.Position.CENTER;
+                                }
+                            }
                         }
                     }
                 }
@@ -209,8 +248,6 @@ public class Sampler {
                         context.telemetry.addData("gold", goldMineralX);
                         context.telemetry.addData("silver 1", silverMineral1X);
                         context.telemetry.addData("silver 2", silverMineral2X);
-                        context.telemetry.update();
-                        context.sleep(6000);
                         if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                             if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
                                 if (tfod != null) tfod.shutdown();
@@ -278,8 +315,27 @@ public class Sampler {
                                 return RobotConstants.Position.CENTER;
                             }
                         } else if ((goldX != -1 && silver1X != -1)) {
-                            if (goldX > silver1X) context.telemetry.addData("position", "center");
-                            else context.telemetry.addData("position", "left");
+                            if (goldX > silver1X) {
+                                if (goldX > RobotConstants.RIGHT_MIN_PIXEL_VALUE || (silver1X > RobotConstants.LEFT_MAX_PIXEL_VALUE && silver1X < RobotConstants.RIGHT_MIN_PIXEL_VALUE)) {
+                                    context.telemetry.addData("position", "right");
+                                } else if (silver1X < RobotConstants.LEFT_MAX_PIXEL_VALUE || (goldX > RobotConstants.LEFT_MAX_PIXEL_VALUE && goldX < RobotConstants.RIGHT_MIN_PIXEL_VALUE))  {
+                                    context.telemetry.addData("position", "center");
+                                } else if (goldX < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
+                                    context.telemetry.addData("position", "left");
+                                } else {
+                                    context.telemetry.addData("position", "center");
+                                }
+                            } else {
+                                if (silver1X > RobotConstants.RIGHT_MIN_PIXEL_VALUE || (goldX > RobotConstants.LEFT_MAX_PIXEL_VALUE && goldX < RobotConstants.RIGHT_MIN_PIXEL_VALUE)) {
+                                    context.telemetry.addData("position", "center");
+                                } else if (goldX < RobotConstants.LEFT_MAX_PIXEL_VALUE || (silver1X > RobotConstants.LEFT_MAX_PIXEL_VALUE && silver1X < RobotConstants.RIGHT_MIN_PIXEL_VALUE))  {
+                                    context.telemetry.addData("position", "left");
+                                } else if (goldX < RobotConstants.LEFT_MAX_PIXEL_VALUE) {
+                                    context.telemetry.addData("position", "left");
+                                } else {
+                                    context.telemetry.addData("position", "center");
+                                }
+                            }
                             context.telemetry.update();
                             context.sleep(6000);
                             tfod.shutdown();
@@ -292,92 +348,5 @@ public class Sampler {
             currentTime = System.currentTimeMillis();
         }
         return RobotConstants.Position.CENTER;
-    }
-    public void getPositionForever() {
-        if (tfod != null) {
-            tfod.activate();
-        } else {
-            context.telemetry.addData("status", "tensorflow not enabled");
-            context.telemetry.update();
-            return;
-        }
-        while (context.opModeIsActive()) {
-            if (tfod != null) {
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null) {
-                    context.telemetry.addData("# Object Detected", updatedRecognitions.size());
-                    for (Recognition recognition : updatedRecognitions) {
-                        if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                            context.telemetry.addData("gold bottom", recognition.getBottom());
-                            context.telemetry.addData("gold top", recognition.getTop());
-                        } else {
-                            context.telemetry.addData("silver bottom", recognition.getBottom());
-                            context.telemetry.addData("silver top", recognition.getTop());
-                        }
-                    }
-                    context.telemetry.update();
-                    context.sleep(7000);
-                    if (updatedRecognitions.size() == 3) {
-                        int goldMineralX = -1;
-                        int silverMineral1X = -1;
-                        int silverMineral2X = -1;
-                        for (Recognition recognition : updatedRecognitions) {
-                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                goldMineralX = (int) recognition.getLeft();
-                            } else if (silverMineral1X == -1) {
-                                silverMineral1X = (int) recognition.getLeft();
-                            } else {
-                                silverMineral2X = (int) recognition.getLeft();
-                            }
-                        }
-                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                            if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                if (tfod != null) tfod.shutdown();
-                                context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.LEFT);
-                                context.telemetry.update();
-               //                 tfod.shutdown();
-               //                 return RobotConstants.Position.LEFT;
-                            } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                if (tfod != null) tfod.shutdown();
-                                context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.RIGHT);
-                                context.telemetry.update();
-                //                tfod.shutdown();
-                                //               return RobotConstants.Position.RIGHT;
-                            } else {
-                                if (tfod != null) tfod.shutdown();
-                                context.telemetry.addData("Gold Mineral Position", RobotConstants.Position.CENTER);
-                                context.telemetry.update();
-                 //               tfod.shutdown();
-                 //               return RobotConstants.Position.CENTER;
-                            }
-                        }
-                    } else if (updatedRecognitions.size() == 2) {
-                        context.telemetry.addData("using two minerals", "");
-                        int goldX = -1;
-                        int silver1X = -1;
-                        int silver2X = -1;
-                        for (Recognition recognition : updatedRecognitions) {
-                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                goldX = (int) recognition.getLeft();
-                            } else if (silver1X == -1) {
-                                silver1X = (int) recognition.getLeft();
-                            } else {
-                                silver2X = (int) recognition.getLeft();
-                            }
-                        }
-                        context.telemetry.addData("gold", goldX);
-                        context.telemetry.addData("silver 1", silver1X);
-                        context.telemetry.addData("silver 2", silver2X);
-                        if ((silver1X != -1 && silver2X != -1)) context.telemetry.addData("pos", RobotConstants.Position.RIGHT);
-                        else if ((goldX != -1 && silver1X != -1)) {
-                            if (goldX > silver1X) context.telemetry.addData("pos", RobotConstants.Position.CENTER);
-                            else context.telemetry.addData("pos", RobotConstants.Position.LEFT);
-                        }
-                        context.telemetry.update();
-                    }
-                }
-            }
-        }
-       // return RobotConstants.Position.CENTER;
     }
 }

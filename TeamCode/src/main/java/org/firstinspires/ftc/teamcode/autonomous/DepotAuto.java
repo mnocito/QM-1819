@@ -54,37 +54,40 @@ public class DepotAuto extends LinearOpMode {
         waitForStart();
         robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
         robot.deploy();
-        robot.rotate(-(robot.samplerTurnDegrees + 90.0), .5, 3000);
         if (robot.samplerTurnDegrees != 0) {
-            sleep(250);
-            robot.moveTicks(-1400, .5, 4000);
-            robot.moveTicks(150, .5, 4000);
-            sleep(250);
+            sleep(100);
             if (robot.samplerTurnDegrees > 0) {
-                robot.rotate(2.0 * robot.samplerTurnDegrees + 15, .5, 3000);
-                robot.moveTicks(-1150, .5, 5000);
+                robot.rotate(-(robot.samplerTurnDegrees + 95.0), .65, 3000);
+                robot.moveTicks(-1400, .5, 3000);
+                robot.moveTicks(50, .5, 500);
+                robot.rotate(2.0 * robot.samplerTurnDegrees, .5, 3000);
+                robot.moveTicks(-1150, .6, 3000);
                 robot.rotate(50, .5, 3000);
                 robot.dropTeamMarker();
-                robot.rotate(50, .5, 3000);
+                robot.rotate(46, .5, 3000);
             } else {
-                robot.rotate(2.0 * robot.samplerTurnDegrees + 10, .5, 3000);
-                robot.moveTicks(-1000, .8, 5000);
-                robot.rotate(110, .8, 3000);
-                robot.strafeTicks(200, .7, 3000);
+                robot.rotate(-(robot.samplerTurnDegrees + 90.0), .65, 3000);
+                robot.moveTicks(-1300, .5, 3000);
+                robot.moveTicks(50, .5, 500);
+                robot.rotate(2.0 * robot.samplerTurnDegrees + 10, .6, 3000);
+                robot.moveTicks(-1000, .6, 3000);
+                robot.rotate(110, .5, 3000);
+                robot.strafeTicks(200, .6, 500);
                 robot.dropTeamMarker();
-                robot.strafeTicks(-200, .7, 3000);
-                robot.rotate(40, .8, 3000);
+                robot.strafeTicks(-200, .6, 500);
+                robot.rotate(45, .5, 3000);
             }
         } else {
+            robot.rotate(-(robot.samplerTurnDegrees + 90.0), .65, 3000);
             sleep(600);
-            robot.moveTicks(-1500, .8, 5000);
+            robot.moveTicks(-1500, .6, 5000);
             sleep(600);
-            robot.rotate(100.5, .6, 3000);
+            robot.rotate(100.5, .5, 3000);
             sleep(200);
-            robot.strafeTicks(300, .8, 1000);
+            robot.strafeTicks(300, .6, 1000);
             robot.dropTeamMarker();
-            robot.strafeTicks(-150, .8, 1000);
-            robot.rotate(35, .6, 3000);
+            robot.strafeTicks(-150, 68, 1000);
+            robot.rotate(37, .5, 3000);
         }
         robot.moveToCrater();
         sleep(200);

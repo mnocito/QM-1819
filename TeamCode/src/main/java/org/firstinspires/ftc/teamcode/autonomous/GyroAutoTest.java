@@ -37,8 +37,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.chassis.Robot;
 
 
-@Autonomous(name="Gyro Auto Test", group = "Autonomous")
-@Disabled
+@Autonomous(name="Gyro PID Test", group = "Autonomous")
+//@Disabled
 public class GyroAutoTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
@@ -54,13 +54,6 @@ public class GyroAutoTest extends LinearOpMode {
         telemetry.update();
         waitForStart();
         //robot.rotate(120, .5, 4000);
-        robot.rotate(-90, .4, 3500);
-        sleep(1000);
-        robot.rotate(90, .4, 3500);
-        sleep(1000);
-        robot.rotate(-90, .4, 3500);
-        sleep(1000);
-        robot.rotate(90, .4, 3500);
-        sleep(1000);
+        robot.rotatePID(-90, .4, 50000);
     }
 }
