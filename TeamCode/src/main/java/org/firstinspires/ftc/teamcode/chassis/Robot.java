@@ -192,7 +192,7 @@ public class Robot {
             context.telemetry.addData("cur pow", newPow);
             context.telemetry.addData("cur angle", currentAngle);
             context.telemetry.addData("angle diff", FtcUtils.abs(degs) - FtcUtils.abs(currentAngle));
-            newPow = FtcUtils.sign(degs) * newPow - getKp() * (degs - currentAngle);
+            newPow = FtcUtils.sign(degs) * (RobotConstants.LOWEST_TURN_POWER + getKp() * FtcUtils.abs(FtcUtils.abs(degs) - FtcUtils.abs(currentAngle)));
             context.telemetry.update();
             currentTime = System.currentTimeMillis();
             imu.updateAngle();
