@@ -29,34 +29,15 @@
 
 package org.firstinspires.ftc.teamcode.autonomous;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import org.firstinspires.ftc.teamcode.chassis.*;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
-import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
-import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
+import org.firstinspires.ftc.teamcode.chassis.Robot;
 
 
-@Autonomous(name="Encoder Auto Test", group = "Autonomous")
+@Autonomous(name="Move Angle Test", group = "Autonomous")
 //@Disabled
-public class EncoderAutoTest extends LinearOpMode {
+public class MoveAngleTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
@@ -70,8 +51,7 @@ public class EncoderAutoTest extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.moveTicks(1500, .5, 5000);
-        sleep(1500);
-        robot.rotate(40, .5, 2500);
+        //robot.rotate(120, .5, 4000);
+        robot.moveAngle(.7, 45, 2000);
     }
 }

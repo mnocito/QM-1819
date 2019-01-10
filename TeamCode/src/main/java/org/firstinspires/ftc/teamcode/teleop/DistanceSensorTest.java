@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -7,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.chassis.Robot;
 import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
-
+@Disabled
 @TeleOp(name = "Drive")
 public class DistanceSensorTest extends LinearOpMode {
     private double front = 0;

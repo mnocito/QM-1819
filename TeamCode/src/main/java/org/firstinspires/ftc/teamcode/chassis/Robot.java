@@ -25,6 +25,7 @@ public class Robot {
     private int encoderPos = 0;
     private int hangEncoderPos = 0;
     private int extendEncoderPos = 0;
+    private int liftEncoderPos = 0;
     public boolean canSample = false;
     private DcMotor FR = null;
     private DcMotor FL = null;
@@ -38,7 +39,7 @@ public class Robot {
     private Servo markerServo = null;
     private LinearOpMode context;
     private Servo nomServo2 = null;
-    private DcMotor catapult = null;
+    private DcMotor lift = null;
     public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors, boolean initVision) {
         this.context = context;
         hwMap = ahwMap;
@@ -46,28 +47,28 @@ public class Robot {
         imu = new IMU();
         sampler = new Sampler();
         FL = hwMap.get(DcMotor.class, "FL");
-        nom = hwMap.get(DcMotor.class, "nom");
+      //  nom = hwMap.get(DcMotor.class, "nom");
         extend = hwMap.get(DcMotor.class, "extend");
-        hang = hwMap.get(DcMotor.class, "hang");
+      //  hang = hwMap.get(DcMotor.class, "hang");
         BR = hwMap.get(DcMotor.class, "BR");
         BL = hwMap.get(DcMotor.class, "BL");
-        frontDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "front");
-        backDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "back");
-        markerServo = hwMap.get(Servo.class, "markerServo");
-        catapult = hwMap.get(DcMotor.class, "catapult");
-        catapult.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+     //   frontDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "front");
+     //   backDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "back");
+     //   markerServo = hwMap.get(Servo.class, "markerServo");
+        lift = hwMap.get(DcMotor.class, "lift");
+        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        nom.setDirection(DcMotorSimple.Direction.FORWARD);
-        hang.setDirection(DcMotorSimple.Direction.REVERSE);
+   //     nom.setDirection(DcMotorSimple.Direction.FORWARD);
+    //    hang.setDirection(DcMotorSimple.Direction.REVERSE);
         extend.setDirection(DcMotorSimple.Direction.FORWARD);
-        catapult.setDirection(DcMotorSimple.Direction.FORWARD);
+        lift.setDirection(DcMotorSimple.Direction.REVERSE);
         FL.setDirection(DcMotorSimple.Direction.FORWARD);
         BL.setDirection(DcMotorSimple.Direction.FORWARD);
-        FR.setDirection(DcMotorSimple.Direction.FORWARD);
+        FR.setDirection(DcMotorSimple.Direction.REVERSE);
         BR.setDirection(DcMotorSimple.Direction.REVERSE);
         resetTicks();
         if (initSensors) {
@@ -117,21 +118,6 @@ public class Robot {
             newPow = FtcUtils.map(FtcUtils.abs(ticks) - FtcUtils.abs(getTicks()), 0, FtcUtils.abs(ticks), RobotConstants.LOWEST_STRAFE_POWER, pow);
         }
         stop();
-        context.telemetry.addData("status", "done");
-        context.telemetry.update();
-    }
-    private void strafeTicksNoStopping(int ticks, double pow, int timeout) {
-        resetTicks();
-        long startTime = System.currentTimeMillis();
-        long currentTime = startTime;
-        while (FtcUtils.abs(getTicks()) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
-            drive(FtcUtils.sign(ticks) * FtcUtils.abs(pow), -FtcUtils.sign(ticks) * FtcUtils.abs(pow), FtcUtils.sign(ticks) * FtcUtils.abs(pow), -FtcUtils.sign(ticks) * FtcUtils.abs(pow));
-            currentTime = System.currentTimeMillis();
-            context.telemetry.addData("Target", ticks);
-            context.telemetry.addData("Current", getTicks());
-            context.telemetry.addData("pow", pow);
-            context.telemetry.update();
-        }
         context.telemetry.addData("status", "done");
         context.telemetry.update();
     }
@@ -253,10 +239,19 @@ public class Robot {
         runEncoderMotor(extend, ticks, pow, timeout);
     }
     public boolean canExtendUp() {
-        return getExtendTicks() <= RobotConstants.MAX_EXTEND_TICKS && context.gamepad2.left_stick_y < 0;
+        return getExtendTicks() <= RobotConstants.MAX_EXTEND_TICKS && context.gamepad2.right_stick_y < 0;
     }
     public boolean canExtendDown() {
-        return getExtendTicks() >= RobotConstants.MIN_EXTEND_TICKS && context.gamepad2.left_stick_y > 0;
+        return getExtendTicks() >= RobotConstants.MIN_EXTEND_TICKS && context.gamepad2.right_stick_y > 0;
+    }
+    public boolean canLiftUp() {
+        return getExtendTicks() <= RobotConstants.MAX_LIFT_TICKS && context.gamepad2.left_stick_y < 0;
+    }
+    public boolean canLiftDown() {
+        return getExtendTicks() >= RobotConstants.MIN_LIFT_TICKS && context.gamepad2.left_stick_y  > 0;
+    }
+    public boolean canLift() {
+        return canLiftUp() || canLiftDown();
     }
     public boolean canExtend() {
         return canExtendUp() || canExtendDown();
@@ -296,16 +291,58 @@ public class Robot {
                 return 0.0;
         }
     }
+    public void moveAngle(int ticks, double pow, double angle, int timeout) {
+        double vx = pow*Math.cos(angle*(Math.PI/180.0)+Math.PI/4);
+        double vy = pow*Math.sin(angle*(Math.PI/180.0)+Math.PI/4);
+        double newvx = vx;
+        double newvy = vy;
+        resetTicks();
+        long startTime = System.currentTimeMillis();
+        long currentTime = startTime;
+        while (FtcUtils.abs(getTicks()) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
+            drive(newvx, newvy, newvy, newvx);
+            drive(FtcUtils.sign(ticks) * FtcUtils.abs(newvx), FtcUtils.sign(ticks) * FtcUtils.abs(newvy), FtcUtils.sign(ticks) * FtcUtils.abs(newvy), FtcUtils.sign(ticks) * FtcUtils.abs(newvx));
+            currentTime = System.currentTimeMillis();
+            context.telemetry.addData("Target", ticks);
+            context.telemetry.addData("Current", getTicks());
+            context.telemetry.update();
+            newvx = FtcUtils.map(FtcUtils.abs(ticks) - FtcUtils.abs(getTicks()), 0, FtcUtils.abs(ticks), RobotConstants.LOWEST_STRAFE_POWER, vx);
+            newvy = FtcUtils.map(FtcUtils.abs(ticks) - FtcUtils.abs(getTicks()), 0, FtcUtils.abs(ticks), RobotConstants.LOWEST_STRAFE_POWER, vy);
+        }
+        stop();
+        context.telemetry.addData("status", "done");
+        context.telemetry.update();
+    }
+    public void moveAngle(double pow, double angle, int time) {
+        double m = 0;
+        double vx = pow*Math.cos(angle*(Math.PI/180.0)+Math.PI/4);
+        double vy = pow*Math.sin(angle*(Math.PI/180.0)+Math.PI/4);
+        if (Math.abs(vx) > m)
+                m = vx;
+        if (Math.abs(vy) > m)
+            m = vy;
+        vx = Math.abs(pow) * vx / Math.abs(m);
+        vy = Math.abs(pow) * vx / Math.abs(m);
+        drive(vx, vy, vy, vx);
+        context.sleep(time);
+        stop();
+        context.telemetry.addData("status", "done");
+        context.telemetry.update();
+    }
     public void resetTicks() {
         encoderPos = BL.getCurrentPosition();
-        hangEncoderPos = hang.getCurrentPosition();
+       // hangEncoderPos = hang.getCurrentPosition();
         extendEncoderPos = extend.getCurrentPosition();
+        liftEncoderPos = lift.getCurrentPosition();
     }
     public int getTicks() {
-        return BL.getCurrentPosition() - encoderPos;
+        return (int) ((BL.getCurrentPosition() - encoderPos) * RobotConstants.REV_ENCODER_COUNT / RobotConstants.NEVEREST_ENCODER_COUNT);
+    }
+    public int getLiftTicks() {
+        return -(lift.getCurrentPosition() - liftEncoderPos);
     }
     public int getHangTicks() {
-        return hang.getCurrentPosition() - hangEncoderPos;
+        return -(hang.getCurrentPosition() - hangEncoderPos);
     }
     public int getExtendTicks() {
         return -(extend.getCurrentPosition() - extendEncoderPos);
@@ -313,8 +350,8 @@ public class Robot {
     public void nom(double power) {
         nom.setPower(power);
     }
-    public void catapult(double power) {
-        catapult.setPower(power);
+    public void lift(double power) {
+        lift.setPower(power);
     }
     public void hang(double power) {
         hang.setPower(power);

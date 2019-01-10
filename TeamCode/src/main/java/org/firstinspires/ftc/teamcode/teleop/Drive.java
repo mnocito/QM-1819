@@ -9,49 +9,57 @@ import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 @TeleOp(name = "Drive")
-public class TestDrive extends LinearOpMode {
+public class Drive extends LinearOpMode {
     private double currentNomServoPos = 0;
     private ElapsedTime runtime = new ElapsedTime();
     private double rightx = 0;
     private double leftx = 0;
     private double lefty = 0;
+    double FLPow = 0;
+    double BLPow = 0;
+    double FRPow = 0;
+    double BRPow = 0;
+    double[] pows = new double[4];
+    double m = 0.0;
     private boolean pressed = false;
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap, this, false);
-        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
+        //robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
         telemetry.addData("Status", "Initialization bas been completed");
         telemetry.update();
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
-            telemetry.addData("servo", robot.nomServoPos());
+            //telemetry.addData("servo", robot.nomServoPos());
             telemetry.addData("extend", robot.getExtendTicks());
-            telemetry.addData("hang", robot.getHangTicks());
-            lefty = FtcUtils.motorScale(gamepad1.left_stick_y) * RobotConstants.sensitivity;
+            telemetry.addData("lift", robot.getLiftTicks());
+            lefty = FtcUtils.motorScale(-gamepad1.left_stick_y) * RobotConstants.sensitivity;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
             leftx = FtcUtils.motorScale(gamepad1.left_stick_x) * RobotConstants.sensitivity;
-            if (FtcUtils.abs(lefty) > RobotConstants.threshold) {
-                robot.drive(-lefty, -lefty, -lefty, -lefty);
-            } else if (FtcUtils.abs(leftx) > RobotConstants.threshold) {
-                robot.drive(leftx, -leftx, leftx, -leftx);
-            }  else if (FtcUtils.abs(rightx) > RobotConstants.threshold) {
-                robot.drive(-rightx, -rightx, rightx, rightx);
-            } else {
-                robot.stop();
+            //      Front Left = +Speed + Turn - Strafe      Front Right  = +Speed - Turn + Strafe
+            //      Back Left  = +Speed + Turn + Strafe      Back Right  = +Speed - Turn - Strafe
+            pows[0] = lefty + leftx + rightx;
+            pows[1] = lefty - leftx + rightx;
+            pows[2] = lefty - leftx - rightx;
+            pows[3] = lefty + leftx - rightx;
+            for (double v : pows)
+                if (Math.abs(v) > m)
+                    m = v;
+            if (m != 0) { // if the max power isn't 0 (can't divide by 0)
+                pows[0] /= Math.abs(m);
+                pows[1] /= Math.abs(m);
+                pows[2] /= Math.abs(m);
+                pows[3] /= Math.abs(m);
             }
-            if (FtcUtils.scale(gamepad2.right_trigger, 0, 1) > RobotConstants.threshold) {
+            robot.drive(FtcUtils.motorScale(pows[0]), FtcUtils.motorScale(pows[1]), FtcUtils.motorScale(pows[2]), FtcUtils.motorScale(pows[3]));
+            /*if (FtcUtils.scale(gamepad2.right_trigger, 0, 1) > RobotConstants.threshold) {
                 robot.nom(1);
             } else if (FtcUtils.scale(gamepad2.left_trigger, 0, 1) > RobotConstants.threshold) {
                 robot.nom(-1);
             } else {
                 robot.nom(0);
-            }
-            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.right_stick_y)) > RobotConstants.threshold) {
-                robot.catapult(FtcUtils.sign(gamepad2.right_stick_y) * RobotConstants.CATAPULT_MOTOR_POWER);
-            } else {
-                robot.catapult(0);
-            }
-            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold && robot.canExtend()) {
+            }*/
+            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.right_stick_y)) > RobotConstants.threshold && robot.canExtend()) {
                 if (robot.canExtendUp()) {
                     robot.extend(-1);
                 } else if (robot.canExtendDown()) {
@@ -60,6 +68,17 @@ public class TestDrive extends LinearOpMode {
             } else {
                 robot.extend(0);
             }
+            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold && robot.canLift()) {
+                robot.lift(FtcUtils.sign(gamepad2.left_stick_y));
+                /*if (robot.canExtendUp()) {
+                    robot.extend(-1);
+                } else if (robot.canExtendDown()) {
+                    robot.extend(1);
+                }*/
+            } else {
+                robot.lift(0);
+            }
+            /*
             if (gamepad2.y) {
                 robot.nomServo(RobotConstants.NOMSERVO_UP);
             }
@@ -77,13 +96,13 @@ public class TestDrive extends LinearOpMode {
             } else {
                 pressed = false;
             }
-            if (/*robot.canHangUp() &&*/ gamepad2.dpad_up) {
+            if (gamepad2.dpad_up) {
                 robot.hang(1);
-            } else if (/*robot.canHangDown() &&*/ gamepad2.dpad_down) {
+            } else if (gamepad2.dpad_down) {
                 robot.hang(-1);
             } else {
                 robot.hang(0);
-            }
+            }*/
             telemetry.update();
             idle();
         }
