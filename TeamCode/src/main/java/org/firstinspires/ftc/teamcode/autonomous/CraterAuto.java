@@ -49,56 +49,15 @@ public class CraterAuto extends LinearOpMode {
             telemetry.update();
             idle();
         }
-        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
         robot.deploy();
-        robot.rotate(-(robot.samplerTurnDegrees + 90.0), .5, 3000);
-        telemetry.addData("sample", robot.canSample);
-        if (robot.samplerTurnDegrees != 0) {
-            robot.moveTicks(-850, .5, 3000);
-            robot.moveTicks(400, .5, 5000);
-            if (robot.samplerTurnDegrees > 0) {
-                robot.rotate(-70.0, .5, 3000);
-                robot.strafeTicks(-200, .6, 2000);
-                robot.moveTicks(-2000, .5, 5000);
-            } else {
-                robot.rotate(-115.0, .5, 3000);
-                robot.moveTicks(-2400, .65, 2500);
-            }
-            robot.rotate(-45, .5, 3000);
-            robot.strafeTicks(-400, .6, 2000);
-            robot.strafeTicks(250, .6, 3000);
-            robot.moveTicks(-1450, .7, 2000);
-            robot.rotate(90, .7, 2000);
-            robot.dropTeamMarker();
-            robot.rotate(90, .7, 2000);
-            robot.moveTicks(-2650, .6, 5000);
-        } else {
-            sleep(200);
-            robot.moveTicks(-650, .5, 5000);
-            robot.moveTicks(350, .5, 5000);
-            sleep(200);
-            robot.rotate(100, .5, 3000);
-            sleep(200);
-            robot.moveTicks(1800, .5, 5000);
-            sleep(200);
-            robot.rotate(-55, .5, 3000);
-      //      robot.strafeTicks(200, .5, 3000);
-      //      robot.strafeTicks(-200, .5, 3000);
-            sleep(200);
-            robot.moveTicks(1650, .5, 5000);
-            robot.rotate(-50, .5, 2000);
-            sleep(200);
-            robot.dropTeamMarker();
-            robot.rotate(50, .5, 2000);
-            robot.moveTicks(-500, .6, 2000);
-            robot.strafeTicks(900, .5, 3000);
-            robot.strafeTicks(-300, .5, 3000);
-            robot.moveTicks(-2900, .6, 5000);
-        }
-        robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
+        robot.sample();
+        robot.moveToWall();
+        robot.placeTeamMarker();
+        robot.rotate(180, .6, 4000);
+        robot.extendIntoCrater();
         sleep(2000);
     }
 }

@@ -38,7 +38,7 @@ import org.firstinspires.ftc.teamcode.chassis.Robot;
 
 
 @Autonomous(name="Gyro PID Test", group = "Autonomous")
-//@Disabled
+@Disabled
 public class GyroAutoTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {

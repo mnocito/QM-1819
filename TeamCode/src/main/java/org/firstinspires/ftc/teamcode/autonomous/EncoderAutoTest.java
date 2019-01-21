@@ -55,7 +55,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 
 @Autonomous(name="Encoder Auto Test", group = "Autonomous")
-//@Disabled
+@Disabled
 public class EncoderAutoTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {

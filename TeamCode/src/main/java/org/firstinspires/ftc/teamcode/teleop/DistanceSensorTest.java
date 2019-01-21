@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.chassis.Robot;
 import org.firstinspires.ftc.teamcode.misc.FtcUtils;
 import org.firstinspires.ftc.teamcode.misc.RobotConstants;
-@Disabled
-@TeleOp(name = "Drive")
+//@Disabled
+@TeleOp(name = "Distance Sensor Test")
 public class DistanceSensorTest extends LinearOpMode {
     private double front = 0;
     private double back = 0;
@@ -20,11 +20,10 @@ public class DistanceSensorTest extends LinearOpMode {
         telemetry.update();
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
-            front = robot.frontDist();
-            back = robot.backDist();
-            telemetry.addData("front", front);
-            telemetry.addData("front", back);
-            telemetry.addData("diff", front - back);
+            telemetry.addData("front", robot.frontDist());
+            telemetry.addData("back", robot.backDist());
+            telemetry.addData("diff", robot.distDifference());
+            telemetry.update();
         }
         robot.stop();
     }

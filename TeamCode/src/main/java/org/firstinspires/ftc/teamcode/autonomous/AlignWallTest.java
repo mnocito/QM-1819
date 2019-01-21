@@ -37,7 +37,7 @@ import org.firstinspires.ftc.teamcode.chassis.Robot;
 
 
 @Autonomous(name="Align Wall Test", group = "Autonomous")
-@Disabled
+//@Disabled
 public class AlignWallTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {

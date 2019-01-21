@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.chassis;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,8 +21,8 @@ public class Robot {
     ElapsedTime clock = new ElapsedTime();
     public IMU imu;
     public Sampler sampler;
-    private Rev2mDistanceSensor frontDistanceSensor;
-    private Rev2mDistanceSensor backDistanceSensor;
+    private ModernRoboticsI2cRangeSensor frontDistanceSensor;
+    private ModernRoboticsI2cRangeSensor backDistanceSensor;
     private int encoderPos = 0;
     private int hangEncoderPos = 0;
     private int extendEncoderPos = 0;
@@ -35,7 +36,8 @@ public class Robot {
     private DcMotor extend = null;
     public double samplerTurnDegrees = 0;
     private DcMotor BL = null;
-    private Servo nomServo1 = null;
+    private Servo nomRotator = null;
+    private Servo placementRotator = null;
     private Servo markerServo = null;
     private LinearOpMode context;
     private Servo nomServo2 = null;
@@ -47,23 +49,26 @@ public class Robot {
         imu = new IMU();
         sampler = new Sampler();
         FL = hwMap.get(DcMotor.class, "FL");
-      //  nom = hwMap.get(DcMotor.class, "nom");
+        nom = hwMap.get(DcMotor.class, "nom");
         extend = hwMap.get(DcMotor.class, "extend");
-      //  hang = hwMap.get(DcMotor.class, "hang");
+        hang = hwMap.get(DcMotor.class, "hang");
         BR = hwMap.get(DcMotor.class, "BR");
         BL = hwMap.get(DcMotor.class, "BL");
-     //   frontDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "front");
-     //   backDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "back");
+        frontDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "front");
+        backDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "back");
      //   markerServo = hwMap.get(Servo.class, "markerServo");
+        placementRotator = hwMap.get(Servo.class, "placementRotator");
+        nomRotator = hwMap.get(Servo.class, "nomRotator");
         lift = hwMap.get(DcMotor.class, "lift");
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-   //     nom.setDirection(DcMotorSimple.Direction.FORWARD);
-    //    hang.setDirection(DcMotorSimple.Direction.REVERSE);
+        nom.setDirection(DcMotorSimple.Direction.FORWARD);
+        hang.setDirection(DcMotorSimple.Direction.REVERSE);
         extend.setDirection(DcMotorSimple.Direction.FORWARD);
         lift.setDirection(DcMotorSimple.Direction.REVERSE);
         FL.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -178,7 +183,7 @@ public class Robot {
             context.telemetry.addData("cur pow", newPow);
             context.telemetry.addData("cur angle", currentAngle);
             context.telemetry.addData("angle diff", FtcUtils.abs(degs) - FtcUtils.abs(currentAngle));
-            newPow = FtcUtils.sign(degs) * newPow - getKp() * (degs - currentAngle);
+            newPow = FtcUtils.motorScale(FtcUtils.sign(degs) * RobotConstants.LOWEST_TURN_POWER - getKp() * (degs - currentAngle));
             context.telemetry.update();
             currentTime = System.currentTimeMillis();
             imu.updateAngle();
@@ -191,46 +196,46 @@ public class Robot {
         hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
         if (canSample) samplerTurnDegrees = getSamplerTurnDegrees(2500);
         drive(.5, -.5, .5, -.5, 300);
-        context.sleep(100);
-        moveTicks(-100, .4, 2000);
-        context.sleep(100);
-        strafeTicks(400, .6, 2000);
-        context.sleep(100);
-        moveTicks(100, .4, 2000);
-        context.sleep(100);
+        //moveTicks(-200, .5, 700);
+        //strafeTicks(200, .5, 700);
+        //moveTicks(200, .5, 700);
+        rotate(90, .6, 3500);
     }
     public void alignWithWall(double pow) {
-        double frontDist = frontDist();
-        double backDist = backDist();
-        double initialDist = Math.abs(frontDist - backDist);
         double newPow = pow;
-        while (Math.abs(frontDist - backDist) > 1.0 && context.opModeIsActive()) {
-            drive(-FtcUtils.sign(frontDist - backDist) * newPow, -FtcUtils.sign(frontDist - backDist) * newPow, FtcUtils.sign(frontDist - backDist) * newPow, FtcUtils.sign(frontDist - backDist) * newPow);
-            context.telemetry.addData("front", frontDist);
-            context.telemetry.addData("back", backDist);
+        double initialDist = distDifference();
+        double diff = distDifference();
+        while (Math.abs(diff) > 1.5 && context.opModeIsActive()) {
+            drive(-FtcUtils.sign(diff) * newPow, -FtcUtils.sign(diff) * newPow, FtcUtils.sign(diff) * newPow, FtcUtils.sign(diff) * newPow);
             context.telemetry.addData("initial diff", initialDist);
-            context.telemetry.addData("curr diff", frontDist - backDist);
+            context.telemetry.addData("curr diff", diff);
             context.telemetry.update();
-            newPow = FtcUtils.map(Math.abs(frontDist - backDist), 0, initialDist, RobotConstants.LOWEST_TURN_POWER, pow);
-            frontDist = frontDist();
-            backDist = backDist();
+            newPow = FtcUtils.map(Math.abs(diff), 0, initialDist, RobotConstants.LOWEST_TURN_POWER, pow);
+            diff = distDifference();
         }
         stop();
     }
 
-    public void moveToCrater() {
-        moveTicks(-300, .8, 5000);
-        strafeTicks(1200, .9, 3000);
-        strafeTicks(-300, .7, 1500);
-        moveTicks(-1500, .8, 5000);
-        strafeTicks(1200, .7, 3000);
-        strafeTicks(-130, .7, 3000);
-        moveTicks(-1100, .8, 1500);
+    public void moveToWall() {
+        moveTicks(-300, .5, 1500);
+        rotate(70, .6, 3500);
+        moveTicks(-2000, .6, 5000);
+        rotate(60, .6, 3500);
     }
-    public void dropTeamMarker() {
-        markerServo(RobotConstants.MARKERSERVO_DROP);
-        context.sleep(600);
-        markerServo(RobotConstants.MARKERSERVO_HOLD);
+    public void placeTeamMarker() {
+        moveTicks(-300, .5, 1500);
+        extendTicks(1800, 1, 3000);
+        moveTicks(300, .5, 1500);
+    }
+    public void extendIntoCrater() {
+        extendTicks(1800, 1, 3000);
+    }
+    public void sample() {
+        if (canSample) {
+            rotate(samplerTurnDegrees, .6, 2000);
+            extendTicks(100, 1, 3000);
+            rotate(-samplerTurnDegrees, .6, 2000);
+        }
     }
     public void hangTicks(int ticks, double pow, int timeout) {
         runEncoderMotor(hang, ticks, pow, timeout);
@@ -239,16 +244,16 @@ public class Robot {
         runEncoderMotor(extend, ticks, pow, timeout);
     }
     public boolean canExtendUp() {
-        return getExtendTicks() <= RobotConstants.MAX_EXTEND_TICKS && context.gamepad2.right_stick_y < 0;
+        return getExtendTicks() <= RobotConstants.MAX_EXTEND_TICKS && context.gamepad2.left_stick_y < 0;
     }
     public boolean canExtendDown() {
-        return getExtendTicks() >= RobotConstants.MIN_EXTEND_TICKS && context.gamepad2.right_stick_y > 0;
+        return getExtendTicks() >= RobotConstants.MIN_EXTEND_TICKS && context.gamepad2.left_stick_y > 0;
     }
     public boolean canLiftUp() {
-        return getExtendTicks() <= RobotConstants.MAX_LIFT_TICKS && context.gamepad2.left_stick_y < 0;
+        return getLiftTicks() <= RobotConstants.MAX_LIFT_TICKS && context.gamepad2.right_stick_y < 0;
     }
     public boolean canLiftDown() {
-        return getExtendTicks() >= RobotConstants.MIN_LIFT_TICKS && context.gamepad2.left_stick_y  > 0;
+        return getLiftTicks() >= RobotConstants.MIN_LIFT_TICKS && context.gamepad2.right_stick_y  > 0;
     }
     public boolean canLift() {
         return canLiftUp() || canLiftDown();
@@ -284,7 +289,7 @@ public class Robot {
             case LEFT:
                 return 35.0;
             case RIGHT:
-                return -35.0;
+                return -32.0;
             case CENTER:
                 return 0.0;
             default:
@@ -292,10 +297,17 @@ public class Robot {
         }
     }
     public void moveAngle(int ticks, double pow, double angle, int timeout) {
+        double m = 0;
         double vx = pow*Math.cos(angle*(Math.PI/180.0)+Math.PI/4);
         double vy = pow*Math.sin(angle*(Math.PI/180.0)+Math.PI/4);
         double newvx = vx;
         double newvy = vy;
+        if (Math.abs(vx) > m)
+            m = vx;
+        if (Math.abs(vy) > m)
+            m = vy;
+        vx = Math.abs(pow) * vx / Math.abs(m);
+        vy = Math.abs(pow) * vy / Math.abs(m);
         resetTicks();
         long startTime = System.currentTimeMillis();
         long currentTime = startTime;
@@ -322,7 +334,7 @@ public class Robot {
         if (Math.abs(vy) > m)
             m = vy;
         vx = Math.abs(pow) * vx / Math.abs(m);
-        vy = Math.abs(pow) * vx / Math.abs(m);
+        vy = Math.abs(pow) * vy / Math.abs(m);
         drive(vx, vy, vy, vx);
         context.sleep(time);
         stop();
@@ -331,7 +343,7 @@ public class Robot {
     }
     public void resetTicks() {
         encoderPos = BL.getCurrentPosition();
-       // hangEncoderPos = hang.getCurrentPosition();
+        hangEncoderPos = hang.getCurrentPosition();
         extendEncoderPos = extend.getCurrentPosition();
         liftEncoderPos = lift.getCurrentPosition();
     }
@@ -359,28 +371,26 @@ public class Robot {
     public void extend(double power) {
         extend.setPower(power);
     }
-    public void nomServo(double pos) {
-        if (nomServo2 == null) {
-            nomServo2 = hwMap.get(Servo.class, "nomServo2");
-            nomServo2.setDirection(Servo.Direction.REVERSE);
-        }
-        nomServo2.setPosition(pos);
+    public void nomRotator(double pos) {
+        nomRotator.setPosition(pos);
+    }
+    public void placementRotator(double pos) {
+        placementRotator.setPosition(pos);
     }
     public void markerServo(double pos) {
         markerServo.setPosition(pos);
     }
-    public double nomServoPos() {
-        if (nomServo2 == null ) {
-            nomServo2 = hwMap.get(Servo.class, "nomServo2");
-            nomServo2.setDirection(Servo.Direction.REVERSE);
-        }
-        return nomServo2.getPosition();
+    public double nomRotatorPos() {
+        return nomRotator.getPosition();
     }
     public double frontDist() {
         return frontDistanceSensor.getDistance(DistanceUnit.INCH);
     }
     public double backDist() {
         return backDistanceSensor.getDistance(DistanceUnit.INCH);
+    }
+    public double distDifference() {
+        return frontDist() - backDist();
     }
     public void stop() {
         drive(0, 0, 0, 0);

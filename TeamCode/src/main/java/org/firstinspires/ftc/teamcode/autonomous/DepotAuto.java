@@ -52,45 +52,10 @@ public class DepotAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.markerServo(RobotConstants.MARKERSERVO_HOLD);
         robot.deploy();
-        if (robot.samplerTurnDegrees != 0) {
-            sleep(100);
-            if (robot.samplerTurnDegrees > 0) {
-                robot.rotate(-(robot.samplerTurnDegrees + 95.0), .65, 3000);
-                robot.moveTicks(-1400, .5, 3000);
-                robot.moveTicks(50, .5, 500);
-                robot.rotate(2.0 * robot.samplerTurnDegrees, .5, 3000);
-                robot.moveTicks(-1150, .6, 3000);
-                robot.rotate(50, .5, 3000);
-                robot.dropTeamMarker();
-                robot.rotate(46, .5, 3000);
-            } else {
-                robot.rotate(-(robot.samplerTurnDegrees + 90.0), .65, 3000);
-                robot.moveTicks(-1300, .5, 3000);
-                robot.moveTicks(50, .5, 500);
-                robot.rotate(2.0 * robot.samplerTurnDegrees + 10, .6, 3000);
-                robot.moveTicks(-1000, .6, 3000);
-                robot.rotate(110, .5, 3000);
-                robot.strafeTicks(200, .6, 500);
-                robot.dropTeamMarker();
-                robot.strafeTicks(-200, .6, 500);
-                robot.rotate(45, .5, 3000);
-            }
-        } else {
-            robot.rotate(-(robot.samplerTurnDegrees + 90.0), .65, 3000);
-            sleep(600);
-            robot.moveTicks(-1500, .6, 5000);
-            sleep(600);
-            robot.rotate(100.5, .5, 3000);
-            sleep(200);
-            robot.strafeTicks(300, .6, 1000);
-            robot.dropTeamMarker();
-            robot.strafeTicks(-150, 68, 1000);
-            robot.rotate(37, .5, 3000);
-        }
-        robot.moveToCrater();
-        sleep(200);
-        robot.nomServo(RobotConstants.NOMSERVO_NEUTRAL);
+        robot.placeTeamMarker();
+        robot.sample();
+        robot.moveToWall();
+        robot.extendIntoCrater();
     }
 }
