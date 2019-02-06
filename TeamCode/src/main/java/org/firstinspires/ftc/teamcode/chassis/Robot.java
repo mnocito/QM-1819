@@ -40,7 +40,6 @@ public class Robot {
     private Servo placementRotator = null;
     private Servo markerServo = null;
     private LinearOpMode context;
-    private Servo nomServo2 = null;
     private DcMotor lift = null;
     public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors, boolean initVision) {
         this.context = context;
@@ -54,9 +53,8 @@ public class Robot {
         hang = hwMap.get(DcMotor.class, "hang");
         BR = hwMap.get(DcMotor.class, "BR");
         BL = hwMap.get(DcMotor.class, "BL");
-        frontDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "front");
-        backDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "back");
-     //   markerServo = hwMap.get(Servo.class, "markerServo");
+        //frontDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "front");
+        //backDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "back");
         placementRotator = hwMap.get(Servo.class, "placementRotator");
         nomRotator = hwMap.get(Servo.class, "nomRotator");
         lift = hwMap.get(DcMotor.class, "lift");
@@ -69,7 +67,7 @@ public class Robot {
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         nom.setDirection(DcMotorSimple.Direction.FORWARD);
         hang.setDirection(DcMotorSimple.Direction.REVERSE);
-        extend.setDirection(DcMotorSimple.Direction.FORWARD);
+        extend.setDirection(DcMotorSimple.Direction.REVERSE);
         lift.setDirection(DcMotorSimple.Direction.REVERSE);
         FL.setDirection(DcMotorSimple.Direction.FORWARD);
         BL.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -114,7 +112,7 @@ public class Robot {
         long currentTime = startTime;
         double newPow = FtcUtils.map(FtcUtils.abs(ticks) - FtcUtils.abs(getTicks()), 0, FtcUtils.abs(ticks), RobotConstants.LOWEST_STRAFE_POWER, pow);
          while (FtcUtils.abs(getTicks()) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
-            drive(FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow), FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow));
+            drive(FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow), -FtcUtils.sign(ticks) * FtcUtils.abs(newPow), FtcUtils.sign(ticks) * FtcUtils.abs(newPow));
             currentTime = System.currentTimeMillis();
             context.telemetry.addData("Target", ticks);
             context.telemetry.addData("Current", getTicks());
@@ -217,23 +215,38 @@ public class Robot {
     }
 
     public void moveToWall() {
-        moveTicks(-300, .5, 1500);
-        rotate(70, .6, 3500);
-        moveTicks(-2000, .6, 5000);
-        rotate(60, .6, 3500);
+        rotate(75, .6, 3500);
+        moveTicks(-1280, .6, 5000);
+        rotate(64, .6, 3500);
     }
     public void placeTeamMarker() {
-        moveTicks(-300, .5, 1500);
-        extendTicks(1800, 1, 3000);
-        moveTicks(300, .5, 1500);
+        moveTicks(-350, .5, 1500);
+        extendTicks(3000, 1, 2000);
+        context.sleep(100);
+        nomRotator(.35);
+        context.sleep(500);
+        nom(-.4);
+        context.sleep(1200);
+        nom(0);
+        nomRotator(.73);
+        extendTicks(3000, -1, 3000);
+        moveTicks(350, .5, 1500);
     }
     public void extendIntoCrater() {
-        extendTicks(1800, 1, 3000);
+        moveTicks(-600, .5, 1500);
+        nomRotator(.50);
+        extendTicks(2500, 1, 6000);
     }
     public void sample() {
         if (canSample) {
             rotate(samplerTurnDegrees, .6, 2000);
-            extendTicks(100, 1, 3000);
+            moveTicks(-800, .5, 3000);
+            context.sleep(300);
+            if (samplerTurnDegrees ==  -27.0) {
+                moveTicks(600, .5, 3000);
+            } else {
+                moveTicks(800, .5, 3000);
+            }
             rotate(-samplerTurnDegrees, .6, 2000);
         }
     }
@@ -241,12 +254,12 @@ public class Robot {
         runEncoderMotor(hang, ticks, pow, timeout);
     }
     public void extendTicks(int ticks, double pow, int timeout) {
-        runEncoderMotor(extend, ticks, pow, timeout);
+        runEncoderMotor(extend, ticks, -pow, timeout);
     }
-    public boolean canExtendUp() {
+    public boolean canExtendOut() {
         return getExtendTicks() <= RobotConstants.MAX_EXTEND_TICKS && context.gamepad2.left_stick_y < 0;
     }
-    public boolean canExtendDown() {
+    public boolean canExtendIn() {
         return getExtendTicks() >= RobotConstants.MIN_EXTEND_TICKS && context.gamepad2.left_stick_y > 0;
     }
     public boolean canLiftUp() {
@@ -259,7 +272,7 @@ public class Robot {
         return canLiftUp() || canLiftDown();
     }
     public boolean canExtend() {
-        return canExtendUp() || canExtendDown();
+        return canExtendOut() || canExtendIn();
     }
     public boolean canHangDown() {
         return getHangTicks() > -RobotConstants.MAX_HANG_TICKS;
@@ -287,14 +300,17 @@ public class Robot {
     public double getSamplerTurnDegrees(int timeout) {
         switch (sampler.getPosition(timeout)) {
             case LEFT:
-                return 35.0;
+                return 33.0;
             case RIGHT:
-                return -32.0;
+                return -27.0;
             case CENTER:
                 return 0.0;
             default:
                 return 0.0;
         }
+    }
+    public double placementRotatorPos() {
+        return placementRotator.getPosition();
     }
     public void moveAngle(int ticks, double pow, double angle, int timeout) {
         double m = 0;

@@ -58,49 +58,57 @@ public class Drive extends LinearOpMode {
             if (FtcUtils.motorScale(Math.sqrt(gamepad2.right_trigger)) > RobotConstants.threshold) {
                 robot.nom(FtcUtils.motorScale(Math.sqrt(gamepad2.right_trigger)));
             } else if (FtcUtils.motorScale(Math.sqrt(gamepad2.left_trigger)) > RobotConstants.threshold) {
-                robot.nom(FtcUtils.motorScale(-Math.sqrt(gamepad2.right_trigger)));
+                robot.nom(FtcUtils.motorScale(-Math.sqrt(gamepad2.left_trigger)));
             } else {
                 robot.nom(0);
             }
-            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold /*&& robot.canExtend()*/) {
-                robot.extend(FtcUtils.motorScale(gamepad2.left_stick_y));
-                /*if (robot.canExtendUp()) {
-                    robot.extend(-1);
-                } else if (robot.canExtendDown()) {
-                    robot.extend(1);
-                }*/
+            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold/* && robot.canExtend()*/) {
+               // robot.extend(FtcUtils.motorScale(gamepad2.left_stick_y));
+                if (robot.canExtendOut()) {
+                    robot.extend(FtcUtils.motorScale(gamepad2.left_stick_y));
+                } else if (robot.canExtendIn()) {
+                    robot.extend(FtcUtils.motorScale(gamepad2.left_stick_y));
+                }
             } else {
                 robot.extend(0);
             }
-            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.right_stick_y)) > RobotConstants.threshold && robot.canLift()) {
+
+            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.right_stick_y)*FtcUtils.motorScale(gamepad2.right_stick_y)) > RobotConstants.threshold && robot.canLift()) {
                 if (robot.canLiftUp()) {
-                    robot.lift(-1);
+                    robot.lift(FtcUtils.sign(gamepad2.right_stick_y)*FtcUtils.motorScale(gamepad2.right_stick_y)*FtcUtils.motorScale(gamepad2.right_stick_y));
                 } else if (robot.canLiftDown()) {
-                    robot.lift(1);
+                    robot.lift(FtcUtils.sign(gamepad2.right_stick_y)*FtcUtils.motorScale(gamepad2.right_stick_y)*FtcUtils.motorScale(gamepad2.right_stick_y));
                 }
             } else {
                 robot.lift(0);
             }
-            if (gamepad2.x) {
-                robot.placementRotator(.35);
-            }
             if (gamepad2.y) {
-                robot.placementRotator(.125);
+                robot.nomRotator(.73);
             }
-            if (gamepad2.a) {
-                robot.nomRotator(.25);
+            if (gamepad2.x) {
+                robot.nomRotator(.31);
             }
             if (gamepad2.b) {
-                robot.nomRotator(.65);
+                robot.placementRotator(.1);
+            }
+            if (gamepad2.a) {
+                robot.placementRotator(.6);
             }
             if (gamepad2.right_bumper) {
+                robot.nomRotator(.70);
+            }
+            /*if (gamepad2.a) {
                 if (!pressed) {
+                    if (robot.placementRotatorPos() == .76) {
+                        robot.placementRotator(.3);
+                    } else {
+                        robot.placementRotator(.76);
+                    }
                     pressed = true;
-                    RobotConstants.MIN_EXTEND_TICKS -= 100;
                 }
             } else {
                 pressed = false;
-            }
+            }*/
             if (gamepad2.dpad_up) {
                 robot.hang(1);
             } else if (gamepad2.dpad_down) {
