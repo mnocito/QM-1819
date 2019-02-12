@@ -45,6 +45,6 @@ public class ResetServoAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.nomRotator(.73);
+        robot.nomRotator(.875);
     }
 }

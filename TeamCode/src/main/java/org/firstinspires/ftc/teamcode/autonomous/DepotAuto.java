@@ -43,7 +43,7 @@ public class DepotAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
-        robot.init(hardwareMap, this, true, true);
+        robot.init(hardwareMap, this, true, true, RobotConstants.AutoType.DEPOT);
         while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
             telemetry.addData("Status", "waiting for calibration");
             telemetry.update();
@@ -53,9 +53,10 @@ public class DepotAuto extends LinearOpMode {
         telemetry.update();
         waitForStart();
         robot.deploy();
+        robot.placementRotator(RobotConstants.PLACEMENTSERVO_RECEIVE);
         robot.placeTeamMarker();
         robot.sample();
         robot.moveToWall();
-        robot.extendIntoCrater();
+        robot.moveToCrater();
     }
 }

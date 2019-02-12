@@ -36,8 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.chassis.Robot;
 
 
-@Autonomous(name="Move Angle Test", group = "Autonomous")
-@Disabled
+@Autonomous(name="Strafe Test", group = "Autonomous")
 public class MoveAngleTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
@@ -52,7 +51,6 @@ public class MoveAngleTest extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        //robot.rotate(120, .5, 4000);
         robot.strafeTicks(900, .7, 3000);
     }
 }

@@ -43,7 +43,7 @@ public class CraterAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "waiting for imu to init");
         telemetry.update();
-        robot.init(hardwareMap, this, true, true);
+        robot.init(hardwareMap, this, true, true, RobotConstants.AutoType.CRATER);
         while (!robot.imu.isGyroCalibrated() && opModeIsActive()) {
             telemetry.addData("Status", "waiting for calibration");
             telemetry.update();
@@ -53,11 +53,11 @@ public class CraterAuto extends LinearOpMode {
         telemetry.update();
         waitForStart();
         robot.deploy();
+        robot.placementRotator(RobotConstants.PLACEMENTSERVO_RECEIVE);
         robot.sample();
         robot.moveToWall();
         robot.placeTeamMarker();
         robot.rotate(180, .6, 4000);
-        robot.extendIntoCrater();
-        sleep(2000);
+        robot.moveToCrater();
     }
 }

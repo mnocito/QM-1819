@@ -36,14 +36,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.chassis.Robot;
 
 
-@Autonomous(name="Extend Out Test", group = "Autonomous")
-public class ExtendOutTest extends LinearOpMode {
+@Autonomous(name="Place Team Marker Test", group = "Autonomous")
+public class PlaceTeamMarkerTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap, this, false);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.extendTicks(1000, .5, 2000);
+        robot.placementRotator(.6);
+        robot.placeTeamMarkerWithoutMoving();
     }
 }

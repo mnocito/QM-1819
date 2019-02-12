@@ -28,6 +28,7 @@ public class Robot {
     private int extendEncoderPos = 0;
     private int liftEncoderPos = 0;
     public boolean canSample = false;
+    private RobotConstants.AutoType autoType;
     private DcMotor FR = null;
     private DcMotor FL = null;
     private DcMotor BR = null;
@@ -81,6 +82,9 @@ public class Robot {
         if (initVision) {
             canSample = sampler.init(hwMap, this.context);
         }
+    }
+    public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors, boolean initVision, RobotConstants.AutoType autoType) {
+        this.autoType = autoType;
     }
     public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors) {
         init(ahwMap, context, initSensors, false);
@@ -191,12 +195,10 @@ public class Robot {
         context.telemetry.update();
     }
     public void deploy() {
+        placementRotator.setPosition(.6);
         hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
         if (canSample) samplerTurnDegrees = getSamplerTurnDegrees(2500);
         drive(.5, -.5, .5, -.5, 300);
-        //moveTicks(-200, .5, 700);
-        //strafeTicks(200, .5, 700);
-        //moveTicks(200, .5, 700);
         rotate(90, .6, 3500);
     }
     public void alignWithWall(double pow) {
@@ -215,37 +217,56 @@ public class Robot {
     }
 
     public void moveToWall() {
-        rotate(75, .6, 3500);
-        moveTicks(-1280, .6, 5000);
-        rotate(64, .6, 3500);
+        if (samplerTurnDegrees == 30.0) rotate(75 - samplerTurnDegrees, .6, 2500);
+        else if (samplerTurnDegrees == -27.0) rotate(75 - samplerTurnDegrees - 37, .6, 2050);
+        else if(samplerTurnDegrees == 0) rotate(75 - samplerTurnDegrees - 20, .6, 2500);
+        if (samplerTurnDegrees == 30.0) moveTicks(-1280, .6, 2500);
+        else if (samplerTurnDegrees == -27.0) moveTicks(-1320, .6, 2500);
+        else if (samplerTurnDegrees == 0) moveTicks(-1280, .6, 2500);
+        if (samplerTurnDegrees == 30.0) rotate(66, .6, 2500);
+        else if (samplerTurnDegrees == -27.0) rotate(70, .6, 2500);
+        else if (samplerTurnDegrees == 0) rotate(66, .6, 2500);
     }
     public void placeTeamMarker() {
-        moveTicks(-350, .5, 1500);
-        extendTicks(3000, 1, 2000);
-        context.sleep(100);
-        nomRotator(.35);
-        context.sleep(500);
-        nom(-.4);
-        context.sleep(1200);
-        nom(0);
-        nomRotator(.73);
-        extendTicks(3000, -1, 3000);
-        moveTicks(350, .5, 1500);
+        if (autoType == RobotConstants.AutoType.DEPOT) {
+            moveTicks(-350, .5, 1500);
+            extendTicks(1700, 1, 3000);
+            nomRotator(RobotConstants.NOMSERVO_DOWN);
+            context.sleep(600);
+            nom(-.4);
+            context.sleep(600);
+            nom(0);
+            nomRotator(RobotConstants.NOMSERVO_UP);
+            extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            int extendPos2 = extend.getCurrentPosition();
+            extendTicks(-10, .1, 3000);
+            extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            moveTicks(350, .5, 1500);
+        } else if (autoType == RobotConstants.AutoType.CRATER) {
+            moveTicks(-1800, .5, 1500);
+            nomRotator(RobotConstants.NOMSERVO_DOWN);
+            context.sleep(600);
+            nom(-.4);
+            context.sleep(600);
+            nom(0);
+            nomRotator(RobotConstants.NOMSERVO_UP);
+        }
     }
-    public void extendIntoCrater() {
-        moveTicks(-600, .5, 1500);
-        nomRotator(.50);
-        extendTicks(2500, 1, 6000);
+    public void moveToCrater() {
+        if (autoType == RobotConstants.AutoType.DEPOT) moveTicks(-900, .5, 2200);
+        if (autoType == RobotConstants.AutoType.CRATER) moveTicks(-1700, .5, 2200);
+        nomRotator(RobotConstants.NOMSERVO_NEUTRAL);
+        while (context.opModeIsActive()) context.idle();
     }
     public void sample() {
         if (canSample) {
             rotate(samplerTurnDegrees, .6, 2000);
-            moveTicks(-800, .5, 3000);
-            context.sleep(300);
+            moveTicks(-1000, .6, 3000);
+            context.sleep(100);
             if (samplerTurnDegrees ==  -27.0) {
-                moveTicks(600, .5, 3000);
+                moveTicks(800, .6, 3000);
             } else {
-                moveTicks(800, .5, 3000);
+                moveTicks(1000, .6, 3000);
             }
             rotate(-samplerTurnDegrees, .6, 2000);
         }
@@ -286,7 +307,7 @@ public class Robot {
         long startTime = System.currentTimeMillis();
         long currentTime = startTime;
         while (FtcUtils.abs(currentPos) < FtcUtils.abs(ticks) && currentTime - startTime < timeout && context.opModeIsActive()) {
-            motor.setPower(pow);
+            motor.setPower(FtcUtils.sign(ticks) * pow);
             currentTime = System.currentTimeMillis();
             context.telemetry.addData("Target", ticks);
             context.telemetry.addData("Current", currentPos);
@@ -300,7 +321,7 @@ public class Robot {
     public double getSamplerTurnDegrees(int timeout) {
         switch (sampler.getPosition(timeout)) {
             case LEFT:
-                return 33.0;
+                return 30.0;
             case RIGHT:
                 return -27.0;
             case CENTER:
