@@ -57,7 +57,6 @@ public class CraterAuto extends LinearOpMode {
         robot.sample();
         robot.moveToWall();
         robot.placeTeamMarker();
-        robot.rotate(180, .6, 4000);
         robot.moveToCrater();
     }
 }

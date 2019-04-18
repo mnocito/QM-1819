@@ -5,7 +5,9 @@ import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -37,6 +39,8 @@ public class Robot {
     private DcMotor extend = null;
     public double samplerTurnDegrees = 0;
     private DcMotor BL = null;
+    PwmControl placementPWM;
+    PwmControl nomPWM;
     private Servo nomRotator = null;
     private Servo placementRotator = null;
     private Servo markerServo = null;
@@ -65,6 +69,7 @@ public class Robot {
         FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        nom.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         nom.setDirection(DcMotorSimple.Direction.FORWARD);
         hang.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -85,6 +90,7 @@ public class Robot {
     }
     public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors, boolean initVision, RobotConstants.AutoType autoType) {
         this.autoType = autoType;
+        init(ahwMap, context, initSensors, initVision);
     }
     public void init(HardwareMap ahwMap, LinearOpMode context, boolean initSensors) {
         init(ahwMap, context, initSensors, false);
@@ -109,6 +115,13 @@ public class Robot {
         stop();
         context.telemetry.addData("status", "done");
         context.telemetry.update();
+    }
+    public void timeoutExample(int timeout) {
+        long startTime = System.currentTimeMillis();
+        long currentTime = startTime;
+         while (currentTime - startTime < timeout) {
+             currentTime = System.currentTimeMillis();
+         }
     }
     public void strafeTicks(int ticks, double pow, int timeout) {
         resetTicks();
@@ -195,7 +208,7 @@ public class Robot {
         context.telemetry.update();
     }
     public void deploy() {
-        placementRotator.setPosition(.6);
+        placementRotator.setPosition(RobotConstants.PLACEMENTSERVO_RECEIVE);
         hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
         if (canSample) samplerTurnDegrees = getSamplerTurnDegrees(2500);
         drive(.5, -.5, .5, -.5, 300);
@@ -217,34 +230,56 @@ public class Robot {
     }
 
     public void moveToWall() {
-        if (samplerTurnDegrees == 30.0) rotate(75 - samplerTurnDegrees, .6, 2500);
-        else if (samplerTurnDegrees == -27.0) rotate(75 - samplerTurnDegrees - 37, .6, 2050);
-        else if(samplerTurnDegrees == 0) rotate(75 - samplerTurnDegrees - 20, .6, 2500);
-        if (samplerTurnDegrees == 30.0) moveTicks(-1280, .6, 2500);
-        else if (samplerTurnDegrees == -27.0) moveTicks(-1320, .6, 2500);
-        else if (samplerTurnDegrees == 0) moveTicks(-1280, .6, 2500);
-        if (samplerTurnDegrees == 30.0) rotate(66, .6, 2500);
-        else if (samplerTurnDegrees == -27.0) rotate(70, .6, 2500);
-        else if (samplerTurnDegrees == 0) rotate(66, .6, 2500);
+        if (samplerTurnDegrees == 35.0) rotate(75 - samplerTurnDegrees + 15, .6, 2500);
+        else if (samplerTurnDegrees == -27.0) {
+            if (autoType == RobotConstants.AutoType.DEPOT) rotate(75 - samplerTurnDegrees - 14, .6, 2050);
+            if (autoType == RobotConstants.AutoType.CRATER) rotate(75 - samplerTurnDegrees - 20, .6, 2050);
+        }
+        else if(samplerTurnDegrees == 0.0) {
+            if (autoType == RobotConstants.AutoType.DEPOT) rotate(71, .65, 2500);
+            else rotate(65, .65, 2500);
+        }
+        if (samplerTurnDegrees == 35.0) moveTicks(-1500, .6, 2500);
+        else if (samplerTurnDegrees == -27.0) {
+            if (autoType == RobotConstants.AutoType.DEPOT) moveTicks(-1240, .6, 2500);
+            else moveTicks(-1700, .6, 2500);
+        } else if (samplerTurnDegrees == 0.0) moveTicks(-1350, .6, 2500);
+        if (samplerTurnDegrees == 35.0) rotate(70, .6, 2500);
+        else if (samplerTurnDegrees == -27.0) {
+            if (autoType == RobotConstants.AutoType.DEPOT) rotate(55, .6, 2500);
+            if (autoType == RobotConstants.AutoType.CRATER) rotate(55, .6, 2500);
+        } else if (samplerTurnDegrees == 0.0) {
+            rotate(58, .6, 2500);
+        }
+        //strafeTicks(-100, .6, 500);
+        if (autoType == RobotConstants.AutoType.DEPOT) {
+            strafeTicks(-600, .7, 1000);
+            strafeTicks(150, .6, 500);
+        } else {
+            strafeTicks(-600, .7, 1000);
+            strafeTicks(150, .6, 500);
+        }
     }
     public void placeTeamMarker() {
         if (autoType == RobotConstants.AutoType.DEPOT) {
             moveTicks(-350, .5, 1500);
             extendTicks(1700, 1, 3000);
-            nomRotator(RobotConstants.NOMSERVO_DOWN);
+            nomRotator(RobotConstants.NOMSERVO_DOWN + .15);
             context.sleep(600);
-            nom(-.4);
+            nom(-.8);
             context.sleep(600);
             nom(0);
             nomRotator(RobotConstants.NOMSERVO_UP);
             extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             int extendPos2 = extend.getCurrentPosition();
-            extendTicks(-10, .1, 3000);
+            extendTicks(-800, .1, 3000);
             extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             moveTicks(350, .5, 1500);
         } else if (autoType == RobotConstants.AutoType.CRATER) {
-            moveTicks(-1800, .5, 1500);
-            nomRotator(RobotConstants.NOMSERVO_DOWN);
+            if (samplerTurnDegrees == 0) moveTicks(-1250, .5, 1500);
+            if (samplerTurnDegrees == 35.0) moveTicks(-1850, .5, 1500);
+            if (samplerTurnDegrees == -27.0) moveTicks(-1200, .5, 1500);
+            nomRotator(RobotConstants.NOMSERVO_DOWN + .15);
             context.sleep(600);
             nom(-.4);
             context.sleep(600);
@@ -252,23 +287,52 @@ public class Robot {
             nomRotator(RobotConstants.NOMSERVO_UP);
         }
     }
+    public double liftPower() {
+        return lift.getPower();
+    }
     public void moveToCrater() {
-        if (autoType == RobotConstants.AutoType.DEPOT) moveTicks(-900, .5, 2200);
-        if (autoType == RobotConstants.AutoType.CRATER) moveTicks(-1700, .5, 2200);
-        nomRotator(RobotConstants.NOMSERVO_NEUTRAL);
+        if (autoType == RobotConstants.AutoType.DEPOT) {
+            moveTicks(-900, .5, 2200);
+            nomRotator(RobotConstants.NOMSERVO_NEUTRAL);
+        }
+        if (autoType == RobotConstants.AutoType.CRATER) {
+            if (samplerTurnDegrees == -27.0) moveTicks(1300, .5, 2200);
+            else if (samplerTurnDegrees == 0) moveTicks(1800, .5, 2200);
+            else moveTicks(1700, .5, 2200);
+            strafeTicks(-500, .7, 1600);
+            strafeTicks(100, .6, 600);
+            if (samplerTurnDegrees == -27.0) moveTicks(1200, .5, 2200);
+            else moveTicks(500, .6, 2200);
+        }
         while (context.opModeIsActive()) context.idle();
     }
     public void sample() {
+        int sampleMoveTicks = 1000;
         if (canSample) {
-            rotate(samplerTurnDegrees, .6, 2000);
-            moveTicks(-1000, .6, 3000);
-            context.sleep(100);
+            if (autoType == RobotConstants.AutoType.CRATER) sampleMoveTicks = 850;
+            rotate(samplerTurnDegrees, .5, 2000);
+            if (samplerTurnDegrees == 0) strafeTicks(70, .6, 500);
+            // starting garbage thing
+            /*nomRotator(RobotConstants.NOMSERVO_DOWN);
+            nom(-1);
+            context.sleep(600);
+            extendTicks(1250, 1, 3000);
+            context.sleep(600);
+            nom(0);
+            nomRotator(RobotConstants.NOMSERVO_NEUTRAL);
+            extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            int extendPos2 = extend.getCurrentPosition();
+            extendTicks(-10, .1, 3000);
+            extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
+            //ending garbage thing
+            moveTicks(-sampleMoveTicks, .5, 3000);
+            context.sleep(500);
             if (samplerTurnDegrees ==  -27.0) {
-                moveTicks(800, .6, 3000);
+                moveTicks(sampleMoveTicks - 200, .5, 3000);
             } else {
-                moveTicks(1000, .6, 3000);
+                moveTicks(sampleMoveTicks, .5, 3000);
             }
-            rotate(-samplerTurnDegrees, .6, 2000);
+            rotate(-samplerTurnDegrees, .5, 2000);
         }
     }
     public void hangTicks(int ticks, double pow, int timeout) {
@@ -277,6 +341,9 @@ public class Robot {
     public void extendTicks(int ticks, double pow, int timeout) {
         runEncoderMotor(extend, ticks, -pow, timeout);
     }
+    public void liftTicks(int ticks, double pow, int timeout) {
+        runEncoderMotor(lift, ticks, -pow, timeout);
+    }
     public boolean canExtendOut() {
         return getExtendTicks() <= RobotConstants.MAX_EXTEND_TICKS && context.gamepad2.left_stick_y < 0;
     }
@@ -284,10 +351,10 @@ public class Robot {
         return getExtendTicks() >= RobotConstants.MIN_EXTEND_TICKS && context.gamepad2.left_stick_y > 0;
     }
     public boolean canLiftUp() {
-        return getLiftTicks() <= RobotConstants.MAX_LIFT_TICKS && context.gamepad2.right_stick_y < 0;
+        return getLiftTicks() <= RobotConstants.MAX_LIFT_TICKS && context.gamepad2.left_stick_y < 0;
     }
     public boolean canLiftDown() {
-        return getLiftTicks() >= RobotConstants.MIN_LIFT_TICKS && context.gamepad2.right_stick_y  > 0;
+        return getLiftTicks() >= RobotConstants.MIN_LIFT_TICKS && context.gamepad2.left_stick_y  > 0;
     }
     public boolean canLift() {
         return canLiftUp() || canLiftDown();
@@ -321,7 +388,7 @@ public class Robot {
     public double getSamplerTurnDegrees(int timeout) {
         switch (sampler.getPosition(timeout)) {
             case LEFT:
-                return 30.0;
+                return 35.0;
             case RIGHT:
                 return -27.0;
             case CENTER:

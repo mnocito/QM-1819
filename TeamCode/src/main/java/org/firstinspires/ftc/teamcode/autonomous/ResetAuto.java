@@ -46,6 +46,6 @@ public class ResetAuto extends LinearOpMode {
         telemetry.update();
         waitForStart();
         robot.hangTicks(RobotConstants.MAX_HANG_TICKS, -1, 10000);
-        robot.nomRotator(.73);
+        robot.nomRotator(RobotConstants.NOMSERVO_UP);
     }
 }

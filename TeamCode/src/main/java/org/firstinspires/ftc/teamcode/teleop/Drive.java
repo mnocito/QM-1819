@@ -29,10 +29,11 @@ public class Drive extends LinearOpMode {
         telemetry.addData("Status", "Initialization bas been completed");
         telemetry.update();
         waitForStart();
-        robot.placementRotator(.6);
+        robot.placementRotator(RobotConstants.PLACEMENTSERVO_RECEIVE);
         while (!isStopRequested() && opModeIsActive()) {
             m = 0;
-            //telemetry.addData("extend", robot.getExtendTicks());
+            telemetry.addData("placement position", robot.placementRotatorPos());
+            telemetry.addData("nom position", robot.nomRotatorPos());
             //telemetry.addData("lift", robot.getLiftTicks());
             //telemetry.addData("hang ticks", robot.getHangTicks());
             lefty = FtcUtils.motorScale(-gamepad1.left_stick_y) * RobotConstants.sensitivity;
@@ -68,7 +69,18 @@ public class Drive extends LinearOpMode {
             } else {
                 robot.nom(0);
             }
-            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold/* && robot.canExtend()*/) {
+            if (FtcUtils.motorScale(Math.sqrt(gamepad1.right_trigger)) > RobotConstants.threshold) {
+                robot.extend(FtcUtils.motorScale(-Math.sqrt(gamepad1.right_trigger)));
+            } else if (FtcUtils.motorScale(Math.sqrt(gamepad1.left_trigger)) > RobotConstants.threshold) {
+                robot.extend(FtcUtils.motorScale(Math.sqrt(gamepad1.left_trigger)));
+            } else if (gamepad1.left_bumper) {
+                robot.extend(.35);
+            } else if (gamepad1.right_bumper) {
+                robot.extend(-.35);
+            } else {
+                robot.extend(0);
+            }
+           /* if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold) {
                // robot.extend(FtcUtils.motorScale(gamepad2.left_stick_y));
                 if (robot.canExtendOut()) {
                     robot.extend(FtcUtils.motorScale(gamepad2.left_stick_y));
@@ -77,22 +89,23 @@ public class Drive extends LinearOpMode {
                 }
             } else {
                 robot.extend(0);
-            }
-
-            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.right_stick_y)*FtcUtils.motorScale(gamepad2.right_stick_y)) > RobotConstants.threshold && robot.canLift()) {
+            }*/
+            telemetry.addData("gamepad pow", FtcUtils.sign(gamepad2.left_stick_y)*FtcUtils.motorScale(gamepad2.left_stick_y)*FtcUtils.motorScale(gamepad2.left_stick_y));
+            telemetry.addData("lift power", robot.liftPower());
+            if (FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)*FtcUtils.motorScale(gamepad2.left_stick_y)) > RobotConstants.threshold && robot.canLift()) {
                 if (robot.canLiftUp()) {
-                    robot.lift(FtcUtils.sign(gamepad2.right_stick_y)*FtcUtils.motorScale(gamepad2.right_stick_y)*FtcUtils.motorScale(gamepad2.right_stick_y));
-                } else if (robot.canLiftDown()) {
-                    robot.lift(FtcUtils.sign(gamepad2.right_stick_y)*FtcUtils.motorScale(gamepad2.right_stick_y)*FtcUtils.motorScale(gamepad2.right_stick_y));
+                    robot.lift(FtcUtils.sign(gamepad2.left_stick_y)*FtcUtils.motorScale(gamepad2.left_stick_y)*FtcUtils.motorScale(gamepad2.left_stick_y));
+                } else if (/*robot.canLiftDown() && */FtcUtils.abs(FtcUtils.motorScale(gamepad2.left_stick_y)*FtcUtils.motorScale(gamepad2.left_stick_y) * .5) > RobotConstants.threshold) {
+                    robot.lift(FtcUtils.sign(gamepad2.left_stick_y)*FtcUtils.motorScale(gamepad2.left_stick_y)*FtcUtils.motorScale(gamepad2.left_stick_y) * .5);
                 }
             } else {
                 robot.lift(0);
             }
             if (gamepad2.y) {
-                robot.nomRotator(RobotConstants.NOMSERVO_DOWN);
+                robot.nomRotator(RobotConstants.NOMSERVO_UP);
             }
             if (gamepad2.x) {
-                robot.nomRotator(RobotConstants.NOMSERVO_UP);
+                robot.nomRotator(RobotConstants.NOMSERVO_DOWN);
             }
             if (gamepad2.b) {
                 robot.placementRotator(RobotConstants.PLACEMENTSERVO_PLACE);
