@@ -72,7 +72,7 @@ public class Robot {
         nom.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         nom.setDirection(DcMotorSimple.Direction.FORWARD);
-        hang.setDirection(DcMotorSimple.Direction.REVERSE);
+        hang.setDirection(DcMotorSimple.Direction.FORWARD);
         extend.setDirection(DcMotorSimple.Direction.REVERSE);
         lift.setDirection(DcMotorSimple.Direction.REVERSE);
         FL.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -270,10 +270,7 @@ public class Robot {
             context.sleep(600);
             nom(0);
             nomRotator(RobotConstants.NOMSERVO_UP);
-            extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            int extendPos2 = extend.getCurrentPosition();
-            extendTicks(-800, .1, 3000);
-            extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            extendTicks(-1700, 1, 3000);
             moveTicks(350, .5, 1500);
         } else if (autoType == RobotConstants.AutoType.CRATER) {
             if (samplerTurnDegrees == 0) moveTicks(-1250, .5, 1500);
@@ -458,7 +455,7 @@ public class Robot {
         return -(lift.getCurrentPosition() - liftEncoderPos);
     }
     public int getHangTicks() {
-        return -(hang.getCurrentPosition() - hangEncoderPos);
+        return (hang.getCurrentPosition() - hangEncoderPos);
     }
     public int getExtendTicks() {
         return -(extend.getCurrentPosition() - extendEncoderPos);

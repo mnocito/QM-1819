@@ -13,7 +13,7 @@ public class RobotConstants {
     public static double threshold = .3;
     public static double sensitivity = 1.0;
     public static int MAX_EXTEND_TICKS = 5000;
-    public static int MAX_HANG_TICKS = 23150;
+    public static int MAX_HANG_TICKS = 8080;
     public static int MIN_EXTEND_TICKS = 0;
     public static int MIN_LIFT_TICKS = 0;
     public static int MAX_LIFT_TICKS = 5200; // old = 3200

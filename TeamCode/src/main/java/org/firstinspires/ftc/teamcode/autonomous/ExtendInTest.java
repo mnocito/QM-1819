@@ -34,17 +34,19 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.chassis.Robot;
+import org.firstinspires.ftc.teamcode.misc.RobotConstants;
 
 
 @Autonomous(name="Extend In Test", group = "Autonomous")
-@Disabled
 public class ExtendInTest extends LinearOpMode {
     private Robot robot = new Robot();
     public void runOpMode() throws InterruptedException {
-        robot.init(hardwareMap, this, false);
+        telemetry.addData("Status", "waiting for imu to init");
+        telemetry.update();
+        robot.init(hardwareMap, this, false, false, RobotConstants.AutoType.DEPOT);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.extendTicks(1000, -.5, 2000);
+        robot.placeTeamMarker();
     }
 }

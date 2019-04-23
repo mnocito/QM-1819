@@ -32,10 +32,8 @@ public class Drive extends LinearOpMode {
         robot.placementRotator(RobotConstants.PLACEMENTSERVO_RECEIVE);
         while (!isStopRequested() && opModeIsActive()) {
             m = 0;
-            telemetry.addData("placement position", robot.placementRotatorPos());
-            telemetry.addData("nom position", robot.nomRotatorPos());
-            //telemetry.addData("lift", robot.getLiftTicks());
-            //telemetry.addData("hang ticks", robot.getHangTicks());
+            telemetry.addData("hang ticks", robot.getHangTicks());
+            telemetry.addData("extend ticks", robot.getExtendTicks());
             lefty = FtcUtils.motorScale(-gamepad1.left_stick_y) * RobotConstants.sensitivity;
             lefty = FtcUtils.abs(lefty) >= RobotConstants.threshold ? lefty : 0;
             rightx = FtcUtils.motorScale(gamepad1.right_stick_x) * RobotConstants.sensitivity;
