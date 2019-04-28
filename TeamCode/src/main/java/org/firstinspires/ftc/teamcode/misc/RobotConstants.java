@@ -6,7 +6,7 @@ public class RobotConstants {
     public static double NOMSERVO_DOWN = .099;
     public static double NOMSERVO_NEUTRAL = .37;
     public static double PLACEMENTSERVO_PLACE = .17;
-    public static double PLACEMENTSERVO_RECEIVE = .655;
+    public static double PLACEMENTSERVO_RECEIVE = .61; // .655;
     public static double LOWEST_MOTOR_POWER = .2;
     public static double LOWEST_STRAFE_POWER = .4;
     public static double LOWEST_TURN_POWER = .2;

@@ -116,13 +116,6 @@ public class Robot {
         context.telemetry.addData("status", "done");
         context.telemetry.update();
     }
-    public void timeoutExample(int timeout) {
-        long startTime = System.currentTimeMillis();
-        long currentTime = startTime;
-         while (currentTime - startTime < timeout) {
-             currentTime = System.currentTimeMillis();
-         }
-    }
     public void strafeTicks(int ticks, double pow, int timeout) {
         resetTicks();
         long startTime = System.currentTimeMillis();
@@ -212,6 +205,9 @@ public class Robot {
         hangTicks(RobotConstants.MAX_HANG_TICKS, 1, 10000);
         if (canSample) samplerTurnDegrees = getSamplerTurnDegrees(2500);
         drive(.5, -.5, .5, -.5, 300);
+        moveTicks(-100, .5, 800);
+        strafeTicks(75, .7, 900);
+        moveTicks(100, .5, 800);
         rotate(90, .6, 3500);
     }
     public void alignWithWall(double pow) {
@@ -233,7 +229,7 @@ public class Robot {
         if (samplerTurnDegrees == 35.0) rotate(75 - samplerTurnDegrees + 15, .6, 2500);
         else if (samplerTurnDegrees == -27.0) {
             if (autoType == RobotConstants.AutoType.DEPOT) rotate(75 - samplerTurnDegrees - 14, .6, 2050);
-            if (autoType == RobotConstants.AutoType.CRATER) rotate(75 - samplerTurnDegrees - 20, .6, 2050);
+            if (autoType == RobotConstants.AutoType.CRATER) rotate(75 - samplerTurnDegrees - 23, .6, 2050);
         }
         else if(samplerTurnDegrees == 0.0) {
             if (autoType == RobotConstants.AutoType.DEPOT) rotate(71, .65, 2500);
@@ -247,13 +243,17 @@ public class Robot {
         if (samplerTurnDegrees == 35.0) rotate(70, .6, 2500);
         else if (samplerTurnDegrees == -27.0) {
             if (autoType == RobotConstants.AutoType.DEPOT) rotate(55, .6, 2500);
-            if (autoType == RobotConstants.AutoType.CRATER) rotate(55, .6, 2500);
+            if (autoType == RobotConstants.AutoType.CRATER) rotate(56, .6, 2500);
         } else if (samplerTurnDegrees == 0.0) {
             rotate(58, .6, 2500);
         }
         //strafeTicks(-100, .6, 500);
         if (autoType == RobotConstants.AutoType.DEPOT) {
-            strafeTicks(-600, .7, 1000);
+            if (samplerTurnDegrees == -27.0) {
+                strafeTicks(-1000, .7, 2000);
+            } else {
+                strafeTicks(-600, .7, 1000);
+            }
             strafeTicks(150, .6, 500);
         } else {
             strafeTicks(-600, .7, 1000);
@@ -273,9 +273,9 @@ public class Robot {
             extendTicks(-1700, 1, 3000);
             moveTicks(350, .5, 1500);
         } else if (autoType == RobotConstants.AutoType.CRATER) {
-            if (samplerTurnDegrees == 0) moveTicks(-1250, .5, 1500);
-            if (samplerTurnDegrees == 35.0) moveTicks(-1850, .5, 1500);
-            if (samplerTurnDegrees == -27.0) moveTicks(-1200, .5, 1500);
+            if (samplerTurnDegrees == 0) moveTicks(-1300, .5, 3000);
+            if (samplerTurnDegrees == 35.0) moveTicks(-1850, .5, 3000);
+            if (samplerTurnDegrees == -27.0) moveTicks(-1300, .5, 3000);
             nomRotator(RobotConstants.NOMSERVO_DOWN + .15);
             context.sleep(600);
             nom(-.4);
